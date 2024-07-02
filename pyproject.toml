@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "krakenfx"
+version = "0.1.0"
+description = ""
+authors = ["Olivier Contant <ocontant@cloudoric.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.30"
+pydantic = "^2.7.2"
+alembic = "^1.13.1"
+asyncpg = "^0.29.0"
+httpx = "^0.27.0"
+apscheduler = "^3.10.4"
+psycopg2-binary = "^2.9.9"
+pydantic-settings = "^2.2.1"
+greenlet = "^3.0.3"
+coloredlogs = "^15.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.23.7"
+pytest = "^8.2.1"
+aiosqlite = "^0.20.0"
+ipdb = "^0.13.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/integrations", "tests/unitary"]
