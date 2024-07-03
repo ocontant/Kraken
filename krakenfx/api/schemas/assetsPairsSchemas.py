@@ -1,17 +1,9 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import List, Dict, Union, Optional
-from krakenfx.api.models.assetsPairsModel import (
-    ModelFeeSchedule as ORMFeeSchedule,
-    ModelAssetPairDetails as ORMAssetPairDetails,
-    ModelCollateralAssetDetails as ORMCollateralAssetDetails
-)
 
 class SchemasFeeSchedule(BaseModel):
     volume: int
     fee: float
-
-    class Meta:
-        orm_model = ORMFeeSchedule
 
     @classmethod
     def from_list(cls, lst: List):
@@ -43,9 +35,6 @@ class SchemasAssetPairDetails(BaseModel):
     long_position_limit: Optional[int] = None
     short_position_limit: Optional[int] = None
 
-    class Meta:
-        orm_model = ORMAssetPairDetails
-
     @classmethod
     def from_dict(cls, dct: Dict):
         dct['fees'] = [SchemasFeeSchedule.from_list(fee) for fee in dct['fees']]
@@ -60,10 +49,32 @@ class SchemasCollateralAssetDetails(BaseModel):
     collateral_value: Optional[float] = None
     status: str
 
-    class Meta:
-        orm_model = ORMCollateralAssetDetails
-
 SchemasResultType = Union[SchemasAssetPairDetails, SchemasCollateralAssetDetails]
+
+class SchemasReturnAssetPair(BaseModel):
+    asset_pairs: Dict[str, SchemasResultType]
+
+    @model_validator(mode='before')
+    @classmethod
+    def check_result(cls, values):
+        asset_pairs = values.get('asset_pairs', {})
+        for key, value in asset_pairs.items():
+            if 'aclass_base' in value:
+                asset_pairs[key] = SchemasAssetPairDetails.from_dict(value)
+            elif 'aclass' in value:
+                asset_pairs[key] = SchemasCollateralAssetDetails(**value)
+            else:
+                raise ValueError(f"Unknown structure for asset pair: {key}")
+        values['asset_pairs'] = asset_pairs
+        return values
+
+    @classmethod
+    def from_dict(cls, dct: Dict):
+        return cls(asset_pairs=dct['asset_pairs'])
+    
+
+class SchemasReturnCollateralAssetDetails(BaseModel):
+    assets: Dict[str, SchemasCollateralAssetDetails]
 
 class SchemasResponse(BaseModel):
     error: List[str]

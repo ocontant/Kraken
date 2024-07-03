@@ -6,18 +6,15 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, select
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
+from krakenfx.utils.utils import *
 from krakenfx.api.schemas.assetsPairsSchemas import (
     SchemasResponse,
     SchemasFeeSchedule,
     SchemasAssetPairDetails,
     SchemasCollateralAssetDetails
 )
-from krakenfx.api.models.assetsPairsModel import (
-    ModelFeeSchedule as ORMFeeSchedule,
-    ModelAssetPairDetails as ORMAssetPairDetails,
-    ModelCollateralAssetDetails as ORMCollateralAssetDetails
-)
-from krakenfx.services.spot_market_data.getAssetsPairsService import get_AssetsPairs
+from krakenfx.api.models.assetsPairsModel import ModelAssetsPairs as ORMAssetsPairs
+from krakenfx.services.spot_market_data.getAssetsPairsService import get_AssetsPairs, get_AssetsPairs_from_database
 from krakenfx.repository.storeAssetsPairs import process_asset_pairs
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
@@ -40,76 +37,49 @@ async def db_session(engine):
     async with async_session() as session:
         yield session
 
-async def display_data_model(session):
+async def display_data_model(session: AsyncSession):
     # Display data from the asset pair table
-    results = await session.execute(text('SELECT * FROM model_asset_pair_details'))
-    rows = results.fetchall()
-    logger.trace(f"Asset Pairs in DB: {rows}")
+    results = await session.execute(text('SELECT * FROM assets_pairs'))
+    assets_pairs_data = results.fetchall()
 
-    # Display data from the collateral asset table
-    results = await session.execute(text('SELECT * FROM model_collateral_asset_details'))
-    rows = results.fetchall()
-    logger.trace(f"Collateral Assets in DB: {rows}")
+    # Convert SQLAlchemy Row objects to dictionaries and parse JSON data
+    assets_pairs_data_dicts = []
+    for row in assets_pairs_data:
+        row_dict = dict(row._mapping)
+        row_dict['data'] = json.loads(row_dict['data'])  # Parse the JSON string to a dictionary
+        assets_pairs_data_dicts.append(row_dict)
+
+    # Convert to JSON formatted string
+    truncated_json_data = await truncated_output(json.dumps(assets_pairs_data_dicts, indent=4, default=str), 100)
+
+    # Log the truncated JSON formatted data
+    logger.trace("Asset Pairs in DB:")
+    logger.trace(truncated_json_data)
+
+
 
 # The test case
 @pytest.mark.asyncio
 async def test_assetPairsService_orm_preparation(db_session):
     try:
         logger.flow1("Starting Test")
-
-        asset_pair_data = {
-            "XXBTZUSD": {
-                "altname": "XBTUSD",
-                "wsname": "XBT/USD",
-                "aclass_base": "currency",
-                "base": "XXBT",
-                "aclass_quote": "currency",
-                "quote": "ZUSD",
-                "lot": "unit",
-                "cost_decimals": 2,
-                "pair_decimals": 5,
-                "lot_decimals": 8,
-                "lot_multiplier": 1,
-                "leverage_buy": [2, 3, 4, 5],
-                "leverage_sell": [2, 3, 4, 5],
-                "fees": [[0, 0.26], [50000, 0.24], [100000, 0.22]],
-                "fees_maker": [[0, 0.16], [50000, 0.14], [100000, 0.12]],
-                "fee_volume_currency": "ZUSD",
-                "margin_call": 80,
-                "margin_stop": 40,
-                "ordermin": "0.001",
-                "costmin": "0.01",
-                "tick_size": "0.0001",
-                "status": "online",
-                "long_position_limit": 500,
-                "short_position_limit": 500
-            },
-            "ZUSD": {
-                "aclass": "currency",
-                "altname": "USD",
-                "decimals": 4,
-                "display_decimals": 2,
-                "collateral_value": 1.0,
-                "status": "enabled"
-            }
-        }
-
-        #assetsPairs: SchemasResponse = await get_AssetsPairs()
-
-        await process_asset_pairs(asset_pair_data, db_session)
+        
+        assetsPairs: SchemasResponse = await get_AssetsPairs()
+        await process_asset_pairs(assetsPairs, db_session)
         await display_data_model(db_session)
 
         # Fetch the result using the AssetPairDetails model
-        result = await db_session.execute(select(ORMAssetPairDetails).where(ORMAssetPairDetails.id == "XXBTZUSD"))
+        result = await db_session.execute(select(ORMAssetsPairs).where(ORMAssetsPairs.pair_name == "XXBTZUSD"))
         orm_asset_pair = result.scalar_one_or_none()
         if orm_asset_pair is None:
             pytest.fail("No result found in the table asset pairs for id 'XXBTZUSD'")
 
-        # Fetch the result using the CollateralAssetDetails model
-        result = await db_session.execute(select(ORMCollateralAssetDetails).where(ORMCollateralAssetDetails.id == "ZUSD"))
-        orm_collateral_asset = result.scalar_one_or_none()
-        if orm_collateral_asset is None:
-            pytest.fail("No result found in the table collateral assets for id 'ZUSD'")
+        result = await get_AssetsPairs_from_database(db_session)
+        result_truncated = await truncated_output(json.dumps(result.model_dump(), indent=4, default=str), 100)
+        logger.trace(result_truncated)
+
+        if result is None:
+            pytest.fail("No data return from get_AssetsPairs_from_database()")
 
     except TimeoutError as e:
         pytest.fail(str(e))

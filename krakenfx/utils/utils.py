@@ -3,6 +3,7 @@ import urllib.parse
 import hashlib
 import hmac
 import base64
+import json
 from sqlalchemy.inspection import inspect
 from pydantic import BaseModel
 import pdb
@@ -18,36 +19,14 @@ def generate_api_signature(urlpath, data, secret):
 def object_as_dict(obj):
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
-def pydantic_to_sqlalchemy_model(schema):
-    """
-    Iterates through pydantic schema and parses nested schemas
-    to a dictionary containing SQLAlchemy models.
-    Only works if nested schemas have specified the Meta.orm_model.
-    """
-    parsed_schema = schema.model_dump()  # Use dict() method instead of dict() to get model's dictionary representation
-    pdb.set_trace()
-    for key, value in parsed_schema.items():
-        try:
-            if isinstance(value, list) and len(value) and is_pydantic(value[0]):
-                pdb.set_trace()
-                parsed_schema[key] = [
-                    item.Meta.orm_model(**pydantic_to_sqlalchemy_model(item))
-                    for item in value
-                ]
-            elif is_pydantic(value):
-                pdb.set_trace()
-                parsed_schema[key] = value.Meta.orm_model(
-                    **pydantic_to_sqlalchemy_model(value)
-                )
-        except AttributeError:
-            raise AttributeError(
-                f"Found nested Pydantic model in {schema.__class__} but Meta.orm_model was not specified."
-            )
-    return parsed_schema
-
-def is_pydantic(obj: object) -> bool:
-    """Checks whether an object is a Pydantic model."""
-    return isinstance(obj, BaseModel)
+async def truncated_output(json_data: dict, nbs_lines = int) -> dict:
+    json_lines = json_data.split('\n')
+    if len(json_lines) > nbs_lines:
+        json_lines = json_lines[:nbs_lines]
+        json_lines.append("... [truncated]")
+    truncated_data = '\n'.join(json_lines)
+    
+    return truncated_data
 
 
-__all__ = ['generate_api_signature', 'object_as_dict', 'is_pydantic', 'pydantic_to_sqlalchemy_model']
+__all__ = ['generate_api_signature', 'object_as_dict', 'truncated_output']

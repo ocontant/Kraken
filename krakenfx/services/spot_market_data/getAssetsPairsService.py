@@ -5,9 +5,10 @@ import time
 import urllib.parse
 import json
 import asyncio
-from pydantic import BaseModel
+from sqlalchemy.future import select
 from typing import List, Dict
-from pydantic import ValidationError
+from pydantic import ValidationError, BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
@@ -15,15 +16,19 @@ from krakenfx.utils.utils import generate_api_signature
 from krakenfx.api.schemas.assetsPairsSchemas import (
     SchemasFeeSchedule,
     SchemasAssetPairDetails,
+    SchemasCollateralAssetDetails,
+    SchemasReturnAssetPair,
+    SchemasReturnCollateralAssetDetails,
     SchemasResponse
 )
+from krakenfx.api.models.assetsPairsModel import ModelAssetsPairs
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()
 
 
 @handle_errors
-async def get_AssetsPairs(pair: str = None):
+async def get_AssetsPairs(pair: str = None) -> dict:
     nonce = int(time.time() * 1000)
     urlpath = "/0/public/AssetPairs"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip('/') + urlpath
@@ -46,24 +51,30 @@ async def get_AssetsPairs(pair: str = None):
         response.raise_for_status()
 
         await check_response_errors(response.json())
-        assetsPairsResponse = SchemasResponse(**response.json())
-        await check_schemasResponse_empty(assetsPairsResponse)
-        return assetsPairsResponse.result
-
+        return response.json()["result"]
     
+@handle_errors    
+async def get_AssetsPairs_from_database(session: AsyncSession) -> SchemasReturnAssetPair:
+    result = await session.execute(select(ModelAssetsPairs))
+    orm_asset_pairs = result.scalars().all()
+    asset_pairs_data = {asset.pair_name: asset.data for asset in orm_asset_pairs}
+    return SchemasReturnAssetPair.from_dict({"asset_pairs": asset_pairs_data})
+
 async def main():
-    logger.info("Get Time from Kraken server!")
-    parser = argparse.ArgumentParser(description="Get a ledger entry information")
-    parser.add_argument("-q", "--pair", type=str, help="info: Possible value: [info, leverage, fees, margin]", required=False)
+
+    logger.info("Fetching Asset Pairs from Kraken API!")
+    parser = argparse.ArgumentParser(description="Fetch Asset Pairs")
+    parser.add_argument("-q", "--pair", type=str, help="Specific asset pair to fetch", required=False)
     args = parser.parse_args()
 
+    # Fetch asset pairs from API
     response = await get_AssetsPairs(args.pair)
-    return response
-
+    logger.info("Fetched Asset Pairs from API:")
+    logger.info(json.dumps(response, indent=4, default=str))
+    
 if __name__ == "__main__":
     try:
-        response = asyncio.run(main())
-        logger.info(json.dumps(response, indent=4, default=str))
+        asyncio.run(main())
 
     except TimeoutError as e:
         logger.error(e)
