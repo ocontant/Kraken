@@ -4,12 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.utils import object_as_dict
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.ledgerSchemas import (
+from krakenfx.api.schemas.account_data.ledgerSchemas import (
     SchemasLedger,
     SchemasLedgerResult,
     SchemasLedgers
 )
-from krakenfx.api.models.ledgerModel import ModelLedger as ORMLedger
+from krakenfx.api.models.account_data.ledgerModel import ModelLedger as ORMLedger
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 

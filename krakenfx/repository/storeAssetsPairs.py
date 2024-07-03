@@ -6,13 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.errors import *
 from krakenfx.utils.utils import *
-from krakenfx.api.schemas.assetsPairsSchemas import (
+from krakenfx.api.schemas.spot_market_data.assetsPairsSchemas import (
     SchemasAssetPairDetails,
     SchemasCollateralAssetDetails,
     SchemasFeeSchedule,
     SchemasResponse
 )
-from krakenfx.api.models.assetsPairsModel import ModelAssetsPairs
+from krakenfx.api.models.spot_market_data.assetsPairsModel import ModelAssetsPairs
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 

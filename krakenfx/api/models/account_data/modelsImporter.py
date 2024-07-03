@@ -2,13 +2,13 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-from krakenfx.api.models.balanceModel import *
-from krakenfx.api.models.ledgerModel import *
-from krakenfx.api.models.OrderModel import *
-from krakenfx.api.models.balanceModel import *
-from krakenfx.api.models.tradeBalanceModel import *
-from krakenfx.api.models.tradeHistoryModel import *
-from krakenfx.api.models.assetsPairsModel import *
+from krakenfx.api.models.account_data.balanceModel import *
+from krakenfx.api.models.account_data.ledgerModel import *
+from krakenfx.api.models.account_data.OrderModel import *
+from krakenfx.api.models.account_data.balanceModel import *
+from krakenfx.api.models.account_data.tradeBalanceModel import *
+from krakenfx.api.models.account_data.tradeHistoryModel import *
+from krakenfx.api.models.spot_market_data.assetsPairsModel import *
 
 __all__ = ['Base',
            'ModelFeeSchedule', 'ModelAssetPairDetails', 'ModelCollateralAssetDetails'

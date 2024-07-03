@@ -13,7 +13,7 @@ from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
 from krakenfx.utils.utils import generate_api_signature
-from krakenfx.api.schemas.assetsPairsSchemas import (
+from krakenfx.api.schemas.spot_market_data.assetsPairsSchemas import (
     SchemasFeeSchedule,
     SchemasAssetPairDetails,
     SchemasCollateralAssetDetails,
@@ -21,7 +21,7 @@ from krakenfx.api.schemas.assetsPairsSchemas import (
     SchemasReturnCollateralAssetDetails,
     SchemasResponse
 )
-from krakenfx.api.models.assetsPairsModel import ModelAssetsPairs
+from krakenfx.api.models.spot_market_data.assetsPairsModel import ModelAssetsPairs
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()

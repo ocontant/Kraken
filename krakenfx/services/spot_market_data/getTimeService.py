@@ -4,24 +4,18 @@ import time
 import urllib.parse
 import json
 import asyncio
-from pydantic import BaseModel
-from typing import List
 from pydantic import ValidationError
 from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
+from krakenfx.api.schemas.spot_market_data.timeSchemas import (
+    SchemasTime, 
+    SchemasTimeResponse
+)
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()
-
-class SchemasTime(BaseModel):
-    unixtime: int
-    rfc1123: str
-
-class SchemasTimeResponse(BaseModel):
-    error: List[str]
-    result: SchemasTime
 
 
 @handle_errors

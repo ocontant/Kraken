@@ -1,11 +1,11 @@
 import time
 from sqlalchemy.ext.asyncio import AsyncSession
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.tradebalanceSchemas import (
+from krakenfx.api.schemas.account_data.tradebalanceSchemas import (
     SchemasTradeBalanceResponse,
     SchemasTradeBalance
     )
-from krakenfx.api.models.tradeBalanceModel import (
+from krakenfx.api.models.account_data.tradeBalanceModel import (
     ModelTradeBalance as ORMTradeBalance
     )
 from krakenfx.utils.logger import setup_logging

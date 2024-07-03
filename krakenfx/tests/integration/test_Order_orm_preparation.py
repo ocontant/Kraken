@@ -5,12 +5,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, select
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.OrderSchemas import (
+from krakenfx.api.schemas.account_data.OrderSchemas import (
     SchemasOrdersResponse,
     SchemasOrdersResult,
     SchemasOrder
 )
-from krakenfx.api.models.OrderModel import (
+from krakenfx.api.models.account_data.OrderModel import (
     ModelOrders as ORMOrder,
     ModelOrdersDescription as ORMOrderDescription
 )

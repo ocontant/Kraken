@@ -3,16 +3,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.utils import object_as_dict
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.OrderSchemas import (
+from krakenfx.api.schemas.account_data.OrderSchemas import (
     SchemasOrder,
     SchemasOrderDescription,
     SchemasOrdersResult
     )
-from krakenfx.api.models.OrderModel import (
+from krakenfx.api.models.account_data.OrderModel import (
     ModelOrders as ORMOrder,
     ModelOrdersDescription as ORMOrderDescription
     )
-from krakenfx.api.models.tradeHistoryModel import ModelTradeInfo as ORMTrade
+from krakenfx.api.models.account_data.tradeHistoryModel import ModelTradeInfo as ORMTrade
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 

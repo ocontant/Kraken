@@ -8,7 +8,7 @@ from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
 from krakenfx.utils.utils import generate_api_signature
-from krakenfx.api.schemas.OrderSchemas import (
+from krakenfx.api.schemas.account_data.OrderSchemas import (
     SchemasOrdersResponse,
     SchemasOrdersResult,
     SchemasOrder

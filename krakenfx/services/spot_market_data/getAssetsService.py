@@ -4,30 +4,19 @@ import time
 import urllib.parse
 import json
 import asyncio
-from pydantic import BaseModel
-from typing import List, Dict
 from pydantic import ValidationError
 from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
+from krakenfx.api.schemas.spot_market_data.assetsSchemas import (
+    SchemasAssets,
+    SchemasAssetsReturn,
+    SchemasResponse
+)
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()
-
-class SchemasAssets(BaseModel):
-    aclass: str
-    altname: str
-    decimals: int
-    display_decimals: int
-    status: str
-
-class SchemasAssetsReturn(BaseModel):
-    assets: Dict[str, SchemasAssets]
-
-class SchemasResponse(BaseModel):
-    error: List[str]
-    result: Dict[str, SchemasAssets]
 
 
 @handle_errors
