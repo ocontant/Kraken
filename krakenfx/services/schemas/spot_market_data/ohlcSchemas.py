@@ -21,4 +21,3 @@ class OHLCResult(BaseModel):
 class OHLCResponse(BaseModel):
     error: List[str]
     result: OHLCResult
-

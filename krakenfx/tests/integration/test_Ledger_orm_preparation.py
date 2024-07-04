@@ -5,13 +5,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.account_data.ledgerSchemas import (
+from krakenfx.services.schemas.account_data.ledgerSchemas import (
     SchemasLedger,
     SchemasLedgers,
     SchemasLedgerResult,
     SchemasLedgerResponse
 )
-from krakenfx.api.models.account_data.ledgerModel import (
+from krakenfx.repository.models.account_data.ledgerModel import (
     ModelLedger as ORMLedger
 )
 from krakenfx.services.account_data.ledgerService import get_ledgers

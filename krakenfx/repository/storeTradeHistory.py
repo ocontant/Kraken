@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.utils import object_as_dict
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.account_data.tradehistorySchemas import (
+from krakenfx.services.schemas.account_data.tradehistorySchemas import (
     SchemasTradeHistoryResponse,
     SchemasTradeHistoryResult,
     SchemasTradesReturn,
     SchemasTradeInfo
     )
-from krakenfx.api.models.account_data.tradeHistoryModel import (
+from krakenfx.repository.models.account_data.tradeHistoryModel import (
     ModelTradeInfo as ORMTradeInfo,
     ModelTradesHistory as ORMTradeHistory
     )

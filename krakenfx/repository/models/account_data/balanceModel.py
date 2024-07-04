@@ -1,6 +1,6 @@
 # my_project/api/models/balance.py
 from sqlalchemy import Column, String
-from krakenfx.api.models import Base
+from krakenfx.repository.models import Base
 
 class ModelBalance(Base):
     __tablename__ = 'balances'

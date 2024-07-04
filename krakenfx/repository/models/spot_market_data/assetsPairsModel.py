@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, JSON
 from sqlalchemy.dialects.postgresql import JSONB
-from krakenfx.api.models import Base
+from krakenfx.repository.models import Base
 
 class ModelAssetsPairs(Base):
     __tablename__ = 'assets_pairs'

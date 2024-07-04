@@ -6,17 +6,17 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
-from krakenfx.api.schemas.account_data.tradehistorySchemas import (
+from krakenfx.services.schemas.account_data.tradehistorySchemas import (
     SchemasTradeHistoryResponse,
     SchemasTradeHistoryResult,
     SchemasTradesReturn,
     SchemasTradeInfo
 )
-from krakenfx.api.models.account_data.tradeHistoryModel import (
+from krakenfx.repository.models.account_data.tradeHistoryModel import (
     ModelTradeInfo as ORMTrades,
     ModelTradesHistory as ORMTradesHistory
 )
-from krakenfx.api.models.account_data.OrderModel import ModelOrders as ORMOrders
+from krakenfx.repository.models.account_data.OrderModel import ModelOrders as ORMOrders
 from krakenfx.services.account_data.tradesHistoryService import get_tradeHistory
 from krakenfx.repository.storeTradeHistory import process_tradeHistory
 from krakenfx.utils.logger import setup_logging

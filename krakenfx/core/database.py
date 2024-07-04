@@ -1,7 +1,7 @@
 # my_project/core/database.py
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from krakenfx.api.models import Base 
+from krakenfx.repository.models import Base 
 from krakenfx.core.config import Settings
 
 def get_postgresql_session(settings: Settings, *, force_new=False):

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Float, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from krakenfx.api.models import Base
+from krakenfx.repository.models import Base
 
 class ModelOrdersDescription(Base):                                                  
     __tablename__ = 'orders_descriptions'

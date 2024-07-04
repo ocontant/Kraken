@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from krakenfx.api.models import Base
+from krakenfx.repository.models import Base
 
 class ModelTradeInfo(Base):
     __tablename__ = 'trade_info'

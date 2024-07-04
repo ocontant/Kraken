@@ -1,7 +1,4 @@
-import asyncio
 import json
-from krakenfx.utils.errors import *
-from krakenfx.api.schemas import *
 from krakenfx.utils.errors import *
 from krakenfx.utils.logger import setup_logging
 from typing import List, TypeVar
