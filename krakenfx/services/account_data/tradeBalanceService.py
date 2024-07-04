@@ -20,7 +20,8 @@ async def get_tradeBalance():
     urlpath = "/0/private/TradeBalance"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip('/') + urlpath
     data = {
-        "nonce": nonce
+        "nonce": nonce,
+        "asset": "zusd"
     }
     headers = {
         "API-Key": settings.KRAKEN_API_KEY,

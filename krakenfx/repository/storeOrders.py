@@ -21,7 +21,7 @@ logger = setup_logging()
 async def process_orders(Orders: SchemasOrdersResult, session: AsyncSession):
     logger.info("Processing Orders.")
 
-    logger.trace("L> Variable: process_orders(_ForLoop).Orders:\n{}".format(json.dumps(Orders.model_dump(), indent=4, default=str)))
+    logger.trace("L> Variable: process_orders(_ForLoop).Orders:\n{}".format(json.dumps(Orders, indent=4, default=str)))
     
     # Iterate all Orders
     for order_id, Order in Orders.items():

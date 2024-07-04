@@ -9,10 +9,11 @@ class ModelTradeBalance(Base):
     eb = Column(String, nullable=False)  # Equivalent balance (combined balance of all currencies)
     tb = Column(String, nullable=False)  # Trade balance (combined balance of all equity currencies)
     m = Column(String, nullable=False)  # Margin amount of open positions
+    uv = Column(String, nullable=True) # Unrealized value of open positions
     n = Column(String, nullable=False)  # Unrealized net profit/loss of open positions
     c = Column(String, nullable=False)  # Cost basis of open positions
     v = Column(String, nullable=False)  # Current floating valuation of open positions
     e = Column(String, nullable=False)  # Equity
     mf = Column(String, nullable=False)  # Free margin
-    ml = Column(String, nullable=False)  # Margin level
+    ml = Column(String, nullable=True)  # Margin level
     
