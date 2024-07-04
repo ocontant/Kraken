@@ -6,12 +6,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, select
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
-from krakenfx.services.schemas.account_data.openPositionSchemas import (
+from krakenfx.services.account_data.schemas.openPositionSchemas import (
     SchemasOpenPositionReturn,
     SchemasConsolidatedOpenPosition,
     SchemasOpenPosition
 )
-from krakenfx.repository.models.account_data.openPositionModel import (
+from krakenfx.repository.models.openPositionModel import (
     ModelConsolidatedOpenPosition as ORMConsolidatedOpenPosition,
     ModelOpenPosition as ORMOpenPosition
 )

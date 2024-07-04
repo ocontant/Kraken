@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.utils import object_as_dict
 from krakenfx.utils.errors import *
-from krakenfx.services.schemas.account_data.balanceSchemas import (
+from krakenfx.services.account_data.schemas.balanceSchemas import (
     SchemasAccountBalance
 )
-from krakenfx.repository.models.account_data.balanceModel import ModelBalance as ORMBalance
+from krakenfx.repository.models.balanceModel import ModelBalance as ORMBalance
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 

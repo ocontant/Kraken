@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
-from krakenfx.services.schemas.spot_market_data.depthSchemas import (
+from krakenfx.services.spot_market_data.schemas.depthSchemas import (
     ModelResponseSchema,
 )
 from krakenfx.utils.utils import generate_api_signature

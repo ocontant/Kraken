@@ -5,11 +5,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, select
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
-from krakenfx.services.schemas.account_data.tradebalanceSchemas import (
+from krakenfx.services.account_data.schemas.tradebalanceSchemas import (
     SchemasTradeBalanceResponse,
     SchemasTradeBalance
 )
-from krakenfx.repository.models.account_data.tradeBalanceModel import ModelTradeBalance as ORMTradeBalance
+from krakenfx.repository.models.tradeBalanceModel import ModelTradeBalance as ORMTradeBalance
 from krakenfx.services.account_data.tradeBalanceService import get_tradeBalance
 from krakenfx.repository.storeTradeBalance import process_tradeBalance
 from krakenfx.utils.logger import setup_logging

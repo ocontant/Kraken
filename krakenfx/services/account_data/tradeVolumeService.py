@@ -11,7 +11,7 @@ from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
 from krakenfx.utils.utils import generate_api_signature
-from krakenfx.services.schemas.account_data.tradeVolumeSchemas import (
+from krakenfx.services.account_data.schemas.tradeVolumeSchemas import (
     SchemasFeesMaker,
     SchemasFeesTaker,
     SchemasVolumeSubaccount,

@@ -10,7 +10,7 @@ from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.logger import setup_logging
-from krakenfx.services.schemas.account_data.tradehistorySchemas import (
+from krakenfx.services.account_data.schemas.tradehistorySchemas import (
     SchemasTradeHistoryResponse,
     SchemasTradeHistoryResult,
     SchemasTradesReturn,

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from krakenfx.utils.utils import object_as_dict
 from krakenfx.utils.errors import *
-from krakenfx.services.schemas.account_data.openPositionSchemas import (
+from krakenfx.services.account_data.schemas.openPositionSchemas import (
     SchemasOpenPositionResponse,
     SchemasOpenPosition,
     SchemasConsolidatedOpenPosition,
@@ -12,7 +12,7 @@ from krakenfx.services.schemas.account_data.openPositionSchemas import (
     SchemasConsolidatedOpenPositions,
     SchemasOpenPositionReturn
 )
-from krakenfx.repository.models.account_data.openPositionModel import (
+from krakenfx.repository.models.openPositionModel import (
     ModelConsolidatedOpenPosition as ORMConsolidatedOpenPosition,
     ModelOpenPosition as ORMOpenPosition
 )

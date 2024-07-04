@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from krakenfx.utils.errors import *
 from krakenfx.utils.validations import *
 from krakenfx.core.config import Settings
-from krakenfx.services.schemas.spot_market_data.timeSchemas import (
+from krakenfx.services.spot_market_data.schemas.timeSchemas import (
     SchemasTime, 
     SchemasTimeResponse
 )

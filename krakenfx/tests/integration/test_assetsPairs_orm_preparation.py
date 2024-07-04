@@ -7,13 +7,13 @@ from sqlalchemy import text, select
 from krakenfx.core.database import Base
 from krakenfx.utils.errors import *
 from krakenfx.utils.utils import *
-from krakenfx.services.schemas.spot_market_data.assetsPairsSchemas import (
+from krakenfx.services.spot_market_data.schemas.assetsPairsSchemas import (
     SchemasResponse,
     SchemasFeeSchedule,
     SchemasAssetPairDetails,
     SchemasCollateralAssetDetails
 )
-from krakenfx.repository.models.spot_market_data.assetsPairsModel import ModelAssetsPairs as ORMAssetsPairs
+from krakenfx.repository.models.assetsPairsModel import ModelAssetsPairs as ORMAssetsPairs
 from krakenfx.services.spot_market_data.getAssetsPairsService import get_AssetsPairs, get_AssetsPairs_from_database
 from krakenfx.repository.storeAssetsPairs import process_asset_pairs
 from krakenfx.utils.logger import setup_logging
