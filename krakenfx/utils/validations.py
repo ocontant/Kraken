@@ -12,7 +12,7 @@ logger = setup_logging()
 # Type variable for Pydantic models
 T = TypeVar('T', bound=BaseModel)
 
-@handle_errors
+@async_handle_errors
 async def check_response_errors(response):
     if response['error'] and len(response['error']) > 0:
         logger.trace(json.dumps(f"L> Response contain errors: {response['error']}"))
@@ -24,7 +24,7 @@ async def check_response_errors(response):
     else:
         logger.info("API ResponseOK, No errors found in response.")
 
-@handle_errors
+@async_handle_errors
 async def check_schemasResponse_empty(response: T, field: str = None): # field expect ['open','closed','trades', 'ledger']
     if field is None:
         if hasattr(response, "result"):

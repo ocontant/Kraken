@@ -26,7 +26,7 @@ assetpair = (
    "XXBTZUSD" 
 )
 
-@handle_errors
+@async_handle_errors
 async def get_tradeVolume(assetpair: List[str] = assetpair):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/TradeVolume"

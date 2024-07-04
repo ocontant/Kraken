@@ -13,7 +13,7 @@ from krakenfx.api.models.account_data.ledgerModel import ModelLedger as ORMLedge
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 
-@handle_errors
+@async_handle_errors
 async def process_ledgers(Ledgers: SchemasLedgers, session: AsyncSession):
     logger.info("Processing ledgers.")
 
@@ -30,7 +30,7 @@ async def process_ledgers(Ledgers: SchemasLedgers, session: AsyncSession):
     await session.commit()
 
 
-@handle_errors
+@async_handle_errors
 async def store_ledger(ledger_id: str, ledger: SchemasLedger, session: AsyncSession):
     logger.flow1(f"Processing Ledger ID: {ledger_id}")
 
@@ -64,7 +64,7 @@ async def store_ledger(ledger_id: str, ledger: SchemasLedger, session: AsyncSess
     await session.flush()
     logger.flow1(f"L-> Finished processing ledger ID {ledger_id}.")
 
-@handle_errors
+@async_handle_errors
 async def create_orm_ledger(ledger_id: str, ledger: SchemasLedger) -> ORMLedger:
     logger.flow2(f"L--> Create instance of ORM model ORMLedger for {ledger_id}.")
     ledger_dict = ledger.model_dump(exclude_unset=True)

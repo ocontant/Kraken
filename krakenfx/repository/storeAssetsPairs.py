@@ -16,7 +16,7 @@ from krakenfx.api.models.spot_market_data.assetsPairsModel import ModelAssetsPai
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 
-@handle_errors
+@async_handle_errors
 async def process_asset_pairs(assetsPairs: json, session: AsyncSession):
     logger.info("Processing asset pairs.")
 

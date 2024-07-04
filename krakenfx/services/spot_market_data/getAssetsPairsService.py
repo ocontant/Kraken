@@ -27,7 +27,7 @@ logger = setup_logging()
 settings = Settings()
 
 
-@handle_errors
+@async_handle_errors
 async def get_AssetsPairs(pair: str = None) -> dict:
     nonce = int(time.time() * 1000)
     urlpath = "/0/public/AssetPairs"
@@ -53,7 +53,7 @@ async def get_AssetsPairs(pair: str = None) -> dict:
         await check_response_errors(response.json())
         return response.json()["result"]
     
-@handle_errors    
+@async_handle_errors    
 async def get_AssetsPairs_from_database(session: AsyncSession) -> SchemasReturnAssetPair:
     result = await session.execute(select(ModelAssetsPairs))
     orm_asset_pairs = result.scalars().all()

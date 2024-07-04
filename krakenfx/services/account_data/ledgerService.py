@@ -19,7 +19,7 @@ from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()
 
-@handle_errors
+@async_handle_errors
 async def get_ledgers():
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/Ledgers"

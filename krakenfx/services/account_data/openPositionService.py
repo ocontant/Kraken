@@ -21,7 +21,7 @@ from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 settings = Settings()
 
-@handle_errors
+@async_handle_errors
 async def fetch_openPositions(docalcs: bool = False, consolidation: str = None):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/OpenPositions"
@@ -53,7 +53,7 @@ async def fetch_openPositions(docalcs: bool = False, consolidation: str = None):
         openPositionResponse = SchemasOpenPositionResponse(**response.json())
         return openPositionResponse
 
-@handle_errors
+@async_handle_errors
 async def get_openPositions():
     openPositionsResponse: SchemasOpenPositionResponse = await fetch_openPositions(docalcs=True, consolidation="")
     await check_schemasResponse_empty(openPositionsResponse)

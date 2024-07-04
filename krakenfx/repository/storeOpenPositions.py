@@ -19,7 +19,7 @@ from krakenfx.api.models.account_data.openPositionModel import (
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 
-@handle_errors
+@async_handle_errors
 async def process_openPositions(OpenPositionReturn: SchemasOpenPositionReturn, session: AsyncSession):
     logger.info("Processing Open Positions.")
 
@@ -38,7 +38,7 @@ async def process_openPositions(OpenPositionReturn: SchemasOpenPositionReturn, s
     logger.info("Adding Open Positions to database")
     await session.commit()
 
-@handle_errors
+@async_handle_errors
 async def store_openPosition(trade_id: str, openPosition: SchemasOpenPosition, session: AsyncSession):
     logger.flow1(f"Processing Open Position Trade ID: {trade_id}")
     
@@ -69,7 +69,7 @@ async def store_openPosition(trade_id: str, openPosition: SchemasOpenPosition, s
     
     await session.flush()
 
-@handle_errors
+@async_handle_errors
 async def create_orm_openPosition(trade_id: str, openPosition: SchemasOpenPosition) -> ORMOpenPosition:
     orm_openPosition = ORMOpenPosition(trade_id=trade_id)
     openPosition_dict = openPosition.model_dump()
@@ -80,7 +80,7 @@ async def create_orm_openPosition(trade_id: str, openPosition: SchemasOpenPositi
 
     return orm_openPosition
 
-@handle_errors
+@async_handle_errors
 async def store_consolidatedOpenPosition(consolidatedOpenPosition: SchemasConsolidatedOpenPosition, session: AsyncSession):
     logger.flow1(f"Processing Consolidated Open Position Pair: {consolidatedOpenPosition.pair}")
     
@@ -111,7 +111,7 @@ async def store_consolidatedOpenPosition(consolidatedOpenPosition: SchemasConsol
     
     await session.flush()
 
-@handle_errors
+@async_handle_errors
 async def create_orm_consolidatedOpenPosition(consolidatedOpenPosition: SchemasConsolidatedOpenPosition) -> ORMConsolidatedOpenPosition:
     orm_consolidatedOpenPosition = ORMConsolidatedOpenPosition(**consolidatedOpenPosition.model_dump())
     

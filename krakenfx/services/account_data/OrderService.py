@@ -18,7 +18,7 @@ logger = setup_logging()
 settings = Settings()
 
 
-@handle_errors
+@async_handle_errors
 async def get_Orders(order_status = str):
     nonce = int(time.time() * 1000)
     match order_status:

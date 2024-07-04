@@ -18,7 +18,7 @@ logger = setup_logging()
 settings = Settings()
 
 
-@handle_errors
+@async_handle_errors
 async def get_Time():
     nonce = int(time.time() * 1000)
     urlpath = "/0/public/Time"

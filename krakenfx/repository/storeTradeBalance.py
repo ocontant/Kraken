@@ -11,7 +11,7 @@ from krakenfx.api.models.account_data.tradeBalanceModel import (
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 
-@handle_errors
+@async_handle_errors
 async def process_tradeBalance(TradeBalance: SchemasTradeBalance, session: AsyncSession):
     logger.info("Processing account trade balance.")
     

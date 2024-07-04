@@ -16,7 +16,7 @@ from krakenfx.api.models.account_data.tradeHistoryModel import ModelTradeInfo as
 from krakenfx.utils.logger import setup_logging
 logger = setup_logging()
 
-@handle_errors
+@async_handle_errors
 # async def process_orders(OrdersResult: SchemasOrdersResult, order_status: str, session: AsyncSession):
 async def process_orders(Orders: SchemasOrdersResult, session: AsyncSession):
     logger.info("Processing Orders.")
@@ -34,12 +34,12 @@ async def process_orders(Orders: SchemasOrdersResult, session: AsyncSession):
     logger.info("Adding Orders to database.")
     await session.commit()
 
-@handle_errors
+@async_handle_errors
 async def check_Order_has_descr(order_id: str, Order: SchemasOrder):
     if not hasattr(Order, 'descr'):
         raise InvalidResponseStructureException(f"Order {order_id} doesn't have attribute 'descr")
 
-@handle_errors
+@async_handle_errors
 async def store_Order(order_id, Order: SchemasOrder, session: AsyncSession):
     logger.flow1(f"Processing Order ID: {order_id}")
 
@@ -93,14 +93,14 @@ async def store_Order(order_id, Order: SchemasOrder, session: AsyncSession):
     await session.flush()
     logger.flow1(f"L-> Finished processing orders ID {order_id}.")
 
-@handle_errors
+@async_handle_errors
 async def create_orm_Order_desc(order_id: str, Order_descr: SchemasOrderDescription) -> ORMOrderDescription:
     logger.flow2(f"L--> Create instance of ORM model ORMOrderDescription for {order_id}.")
     Order_descr_dict = Order_descr.model_dump()
     orm_OrderDescr = ORMOrderDescription(id=order_id, **Order_descr_dict)
     return orm_OrderDescr
 
-@handle_errors
+@async_handle_errors
 async def create_orm_Order_withoutDescr(order_id: str, Order: SchemasOrder, orm_OrderDescr: ORMOrderDescription) -> ORMOrder:
     logger.flow2(f"L--> Create instance of ORM model ORMOrder for {order_id}.")
     Order_dict = Order.model_dump(exclude_unset=True)

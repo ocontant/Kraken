@@ -20,7 +20,7 @@ from krakenfx.api.schemas.account_data.tradehistorySchemas import (
 settings = Settings()
 logger = setup_logging()
   
-@handle_errors
+@async_handle_errors
 async def get_tradeHistory():
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/TradesHistory"

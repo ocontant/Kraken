@@ -22,7 +22,7 @@ settings = Settings()
 
 trade_id = ()
 
-@handle_errors
+@async_handle_errors
 async def get_queryTrades(trade_id: List[str] = trade_id):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/QueryTrades"

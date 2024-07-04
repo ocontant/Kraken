@@ -22,7 +22,7 @@ logger = setup_logging()
 settings = Settings()
 
 
-@handle_errors
+@async_handle_errors
 async def get_queryTrades(order_ids: List[str] = None, trades: bool = True, userref: Optional[int] = None, consolidate_taker: bool = False):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/QueryOrders"
