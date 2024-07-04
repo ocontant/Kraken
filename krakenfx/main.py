@@ -1,7 +1,12 @@
 # my_project/main.py
 import asyncio
-import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from krakenfx.core.database import Base
+from krakenfx.utils.errors import *
+from krakenfx.utils.validations import *
+# Could benefit Factory design pattern
+#   An attributes could be define for each repository script to define interval
+#   A loop could replace import and scheduler definition
 from krakenfx.repository.storeBalance import process_balance
 from krakenfx.repository.storeTradeBalance import process_tradeBalance
 from krakenfx.repository.storeTradeHistory import process_tradeHistory
@@ -9,9 +14,11 @@ from krakenfx.repository.storeOrders import process_orders
 from krakenfx.repository.storeLedgers import process_ledgers
 from krakenfx.repository.storeOpenPositions import process_openPositions
 from krakenfx.repository.storeAssetsPairs import process_asset_pairs
+from krakenfx.core.config import Settings
+from krakenfx.utils.logger import setup_logging
+logger = setup_logging()
+settings = Settings()
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 async def main():
     scheduler = AsyncIOScheduler()
