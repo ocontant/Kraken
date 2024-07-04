@@ -17,7 +17,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # set the database URL dynamically from the environment variable
-config.set_main_option('sqlalchemy.url', Settings().DATABASE_URL)
+config.set_main_option('sqlalchemy.url', str(Settings().DATABASE_URL))
 target_metadata = Base.metadata
 
 def run_migrations_offline():
