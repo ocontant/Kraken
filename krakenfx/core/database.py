@@ -1,9 +1,8 @@
 # my_project/core/database.py
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker
+from krakenfx.api.models import Base 
 from krakenfx.core.config import Settings
-
-Base = declarative_base()
 
 def get_postgresql_session(settings: Settings, *, force_new=False):
     if force_new:
@@ -12,4 +11,4 @@ def get_postgresql_session(settings: Settings, *, force_new=False):
         return SessionLocal
     
 # Expose session, base, and engine
-__all__ = ['engine', 'get_postgresql_session']
+__all__ = ['get_postgresql_session', 'Base']

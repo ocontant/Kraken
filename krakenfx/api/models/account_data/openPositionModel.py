@@ -1,7 +1,7 @@
 # krakenfx/api/models/openPositionModel.py
 from sqlalchemy import Column, String, Float, Boolean, Text, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from krakenfx.core.database import Base
+from krakenfx.api.models import Base
 
 class ModelOpenPosition(Base):
     __tablename__ = 'open_positions'
