@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: alembic-autogenerate
+        name: Alembic Autogenerate
+        entry: ./pre_commit_hook.sh
+        language: script
+        files: ^krakenfx/repository/models/.*\.py$

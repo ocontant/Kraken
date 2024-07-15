@@ -17,6 +17,7 @@ psycopg2-binary = "^2.9.9"
 pydantic-settings = "^2.2.1"
 greenlet = "^3.0.3"
 coloredlogs = "^15.0.1"
+pre-commit = "^3.7.1"
 
 
 [tool.poetry.group.dev.dependencies]
