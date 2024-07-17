@@ -77,8 +77,6 @@ async def test_LedgerService_orm_preparation(db_session):
         pytest.fail(str(e))
     except ConnectionError as e:
         pytest.fail(str(e))
-    except KrakenInvalidAPIKeyException as e:
-        pytest.fail(str(e))
     except KrakenFetchResponseException as e:
         pytest.fail(str(e))
     except KrakenInvalidResponseStructureException as e:
