@@ -17,14 +17,24 @@ psycopg2-binary = "^2.9.9"
 pydantic-settings = "^2.2.1"
 greenlet = "^3.0.3"
 coloredlogs = "^15.0.1"
-pre-commit = "^3.7.1"
+
 
 
 [tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.1"
 pytest-asyncio = "^0.23.7"
 pytest = "^8.2.1"
 aiosqlite = "^0.20.0"
 ipdb = "^0.13.13"
+flake8 = "^7.1.0"
+flake8-bugbear = "^24.4.26"
+flake8-comprehensions = "^3.15.0"
+flake8-docstrings = "^1.7.0"
+flake8-import-order = "^0.18.2"
+black = "^24.4.2"
+isort = "^5.13.2"
+pylint = "^3.2.5"
+mypy = "^1.10.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -32,3 +42,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = ["tests/integrations", "tests/unitary"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true

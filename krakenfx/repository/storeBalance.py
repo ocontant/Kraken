@@ -1,27 +1,33 @@
 import json
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from krakenfx.utils.utils import object_as_dict
-from krakenfx.utils.errors import *
-from krakenfx.services.account_data.schemas.balanceSchemas import (
-    SchemasAccountBalance
-)
+
 from krakenfx.repository.models.balanceModel import ModelBalance as ORMBalance
+from krakenfx.services.account_data.schemas.balanceSchemas import SchemasAccountBalance
+from krakenfx.utils.errors import async_handle_errors
 from krakenfx.utils.logger import setup_logging
+
 logger = setup_logging()
+
 
 @async_handle_errors
 async def process_balance(Balances: SchemasAccountBalance, session: AsyncSession):
     logger.info("Processing Balance")
 
-    logger.trace("L> Variable: process_balance(_ForLoop).Balances:\n{}".format(json.dumps(Balances.model_dump(), indent=4)))
+    logger.trace(
+        "L> Variable: process_balance(_ForLoop).Balances:\n{}".format(
+            json.dumps(Balances.model_dump(), indent=4)
+        )
+    )
     for asset, amount in Balances.root.items():
         logger.trace("L> Variable: process_balance(_ForLoop): {asset}:{amount}")
         await store_balance(asset, amount, session)
-    
+
     logger.flow1("Completed processing the last asset in Balances.")
     logger.info("Adding Balances to database.")
     await session.commit()
+
 
 async def store_balance(asset: str, amount: str, session: AsyncSession):
     logger.flow1(f"Processing Balance Asset: {asset}")
@@ -39,7 +45,7 @@ async def store_balance(asset: str, amount: str, session: AsyncSession):
         orm_balance = ORMBalance(asset=asset, amount=amount)
         session.add(orm_balance)
         logger.flow2(f"Created Balance: {orm_balance}")
-    
-    
+
+
 if __name__ == "__main__":
     print("This script cannot be invoked directly!")

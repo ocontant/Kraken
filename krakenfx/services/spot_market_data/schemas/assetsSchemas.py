@@ -1,5 +1,7 @@
+from typing import Dict, List
+
 from pydantic import BaseModel
-from typing import List, Dict
+
 
 class SchemasAssets(BaseModel):
     aclass: str
@@ -8,8 +10,10 @@ class SchemasAssets(BaseModel):
     display_decimals: int
     status: str
 
+
 class SchemasAssetsReturn(BaseModel):
     assets: Dict[str, SchemasAssets]
+
 
 class SchemasResponse(BaseModel):
     error: List[str]

@@ -1,6 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, patch
-from krakenfx.services.balanceService import fetch_account_balance
+
+import pytest
+
+from krakenfx.services.account_data.balanceService import get_accountBalance
+
 
 @pytest.mark.asyncio
 async def test_fetch_account_balance():
@@ -20,13 +23,13 @@ async def test_fetch_account_balance():
             "XXBT": "2.0023152700",
             "XXDG": "0.00000000",
             "XZEC": "0.0000000000",
-            "ZUSD": "0.0000"
-        }
+            "ZUSD": "0.0000",
+        },
     }
     mock_response.raise_for_status = AsyncMock(return_value=None)
 
     with patch("httpx.AsyncClient.post", return_value=mock_response):
         with pytest.raises(ValueError, match="API Error:"):
-            result = await fetch_account_balance()
+            result = await get_accountBalance()
             await mock_response.raise_for_status()
             assert result.result.root["XXBT"] == "2.0023152700"

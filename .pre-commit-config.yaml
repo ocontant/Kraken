@@ -1,8 +1,57 @@
 repos:
-  - repo: local
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
     hooks:
-      - id: alembic-autogenerate
-        name: Alembic Autogenerate
-        entry: ./pre_commit_hook.sh
-        language: script
-        files: ^krakenfx/repository/models/.*\.py$
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: debug-statements
+      - id: name-tests-test
+      - id: requirements-txt-fixer
+      - id: check-toml
+
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --remove-unused-variable
+          - --expand-star-imports
+          - --remove-duplicate-keys
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.18.0
+    hooks:
+      - id: blacken-docs
+        additional_dependencies: [black==23.7.0]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        args: [--prose-wrap=always, --print-width=88]
+
+  # - repo: local
+  #   hooks:
+  #     - id: alembic-autogenerate
+  #       name: Alembic Autogenerate
+  #       entry: ./pre_commit_hook.sh
+  #       language: script
+  #       files: ^krakenfx/repository/models/.*\.py$

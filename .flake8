@@ -1,0 +1,51 @@
+[flake8]
+max-line-length = 120
+
+# Extend ignore rules to avoid conflicts with other tools or personal preferences
+extend-ignore = E203, E266, E501, W503
+
+# Exclude specific directories and files from linting
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    .venv,
+    .env
+
+# Show source code for each error
+show-source = True
+
+# Enable built-in flake8 plugins
+enable-extensions = G
+
+# Select specific error and warning codes to enable
+select = B,C,E,F,W,T4,B9
+
+# Specify the format of the output
+format = default
+
+# Define a set of plugins for additional checks
+plugins =
+    flake8-bugbear,
+    flake8-comprehensions,
+    flake8-docstrings,
+    flake8-import-order
+
+# Configure flake8-bugbear
+[flake8-bugbear]
+max-complexity = 10
+select = B9
+
+# Configure flake8-comprehensions
+[flake8-comprehensions]
+ignore = C400,C401
+
+# Configure flake8-docstrings
+[flake8-docstrings]
+docstring-convention = google
+
+# Configure flake8-import-order
+[flake8-import-order]
+application-import-names = krakenfx
+import-order-style = google

@@ -1,13 +1,15 @@
-#Generic single-database configuration.
+# Generic single-database configuration
 
-### Initial migration:
-``` Shell
+## Initial migration
+
+```Shell
 alembic revision --autogenerate -m "Initial migration"
 alembic upgrade head
 ```
 
-### Successive migrations:
-``` Shell
+## Successive migrations
+
+```Shell
 alembic revision --autogenerate -m "Reason for change"
 alembic upgrade head
 ```

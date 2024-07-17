@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from typing import Dict, List, Optional
+
+from pydantic import BaseModel
+
 
 class SchemasFeesTaker(BaseModel):
     fee: str
@@ -9,6 +11,7 @@ class SchemasFeesTaker(BaseModel):
     tiervolume: str
     nextvolume: str
 
+
 class SchemasFeesMaker(BaseModel):
     fee: str
     minfee: str
@@ -17,9 +20,11 @@ class SchemasFeesMaker(BaseModel):
     nextvolume: Optional[str] = None
     tiervolume: str
 
+
 class SchemasVolumeSubaccount(BaseModel):
     iiban: str
     volume: str
+
 
 class SchemasResult(BaseModel):
     currency: str
@@ -27,6 +32,7 @@ class SchemasResult(BaseModel):
     volume_subaccounts: List[SchemasVolumeSubaccount]
     fees: Dict[str, SchemasFeesTaker]
     fees_maker: Dict[str, SchemasFeesMaker]
+
 
 class SchemasResponse(BaseModel):
     error: List[str]

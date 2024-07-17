@@ -1,9 +1,11 @@
-# my_project/api/models/ledger.py
-from sqlalchemy import Column, String, Float
+# krakenfx/api/models/ledger.py
+from sqlalchemy import Column, Float, String
+
 from krakenfx.repository.models import Base
 
+
 class ModelLedger(Base):
-    __tablename__ = 'ledgers'
+    __tablename__ = "ledgers"
 
     id = Column(String, primary_key=True, index=True)
     aclass = Column(String, nullable=False)

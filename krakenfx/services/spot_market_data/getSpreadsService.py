@@ -1,24 +1,34 @@
-import httpx
-import urllib.parse
-import json
 import asyncio
+import json
+
+import httpx
 from pydantic import ValidationError
-from krakenfx.utils.errors import *
-from krakenfx.utils.validations import *
+
 from krakenfx.core.config import Settings
 from krakenfx.services.spot_market_data.schemas.spreadsSchemas import (
     SchemasGetRecentSpreadsResponse,
 )
-from krakenfx.utils.utils import generate_api_signature
+from krakenfx.utils.errors import (
+    KrakenFetchResponseException,
+    KrakenInvalidAPIKeyException,
+    KrakenInvalidResponseStructureException,
+    KrakenNoOrdersException,
+    async_handle_errors,
+)
 from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.validations import (
+    check_response_errors,
+    check_schemasResponse_empty,
+)
 
 logger = setup_logging()
 settings = Settings()
 
+
 @async_handle_errors
 async def get_recent_spreads(pair: str):
     urlpath = "/0/public/Spread"
-    url = settings.KRAKEN_API_URL.unicode_string().rstrip('/') + urlpath
+    url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
     params = {
         "pair": pair,
     }
@@ -36,16 +46,20 @@ async def get_recent_spreads(pair: str):
         asset_pair_spreads = spreads_response.result.get(pair, [])
         return asset_pair_spreads
 
+
 async def main():
     logger.info("Get Recent Spreads from Kraken server!")
     pair = "XXBTZUSD"
     response = await get_recent_spreads(pair)
     return response
 
+
 if __name__ == "__main__":
     try:
         response = asyncio.run(main())
-        logger.info(json.dumps([spread.dict() for spread in response], indent=4, default=str))
+        logger.info(
+            json.dumps([spread.dict() for spread in response], indent=4, default=str)
+        )
 
     except TimeoutError as e:
         logger.error(e)
@@ -53,13 +67,13 @@ if __name__ == "__main__":
         logger.error(e)
     except ConnectionError as e:
         logger.error(e)
-    except InvalidAPIKeyException as e:
+    except KrakenInvalidAPIKeyException as e:
         logger.error(e)
-    except FetchResponseException as e:
+    except KrakenFetchResponseException as e:
         logger.error(e)
-    except InvalidResponseStructureException as e:
+    except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except NoOrdersException as e:
+    except KrakenNoOrdersException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

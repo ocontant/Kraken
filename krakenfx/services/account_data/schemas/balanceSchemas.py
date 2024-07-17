@@ -1,18 +1,19 @@
-# my_project/api/schemas/balance.py
+# krakenfx/api/schemas/balance.py
+from typing import Dict, List
+
 from pydantic import BaseModel, RootModel
-from typing import Dict, List, Optional
+
 
 class SchemasAccountBalance(RootModel[Dict[str, str]]):
     pass
 
-    model_config = {
-        'from_attributes': True
-    }
+    model_config = {"from_attributes": True}
+
 
 class SchemasBalanceResponse(BaseModel):
     error: List[str]
     result: SchemasAccountBalance
-    
+
 
 """ Explanation
 

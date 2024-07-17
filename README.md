@@ -1,4 +1,5 @@
-### Step 5: Generate and Apply Migrations 
+# Step 5: Generate and Apply Migrations
+
 Whenever you make changes to your models, generate a new migration script:
 
 ```shell

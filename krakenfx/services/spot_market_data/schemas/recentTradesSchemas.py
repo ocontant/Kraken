@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, model_validator
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from pydantic import BaseModel, model_validator
+
 
 class SchemasTradeEntry(BaseModel):
     price: str
@@ -10,16 +12,17 @@ class SchemasTradeEntry(BaseModel):
     miscellaneous: str
     trade_id: int
 
+
 class SchemasRecentTradesResponse(BaseModel):
     error: List[str]
     result: Dict[str, List[SchemasTradeEntry]]
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     def transform_trades(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if 'result' not in values:
+        if "result" not in values:
             raise ValueError("'result' key not found in the response")
 
-        result = values['result']
+        result = values["result"]
         parsed_result = {
             pair: [
                 {
@@ -29,14 +32,14 @@ class SchemasRecentTradesResponse(BaseModel):
                     "type": trade[3],
                     "order_type": trade[4],
                     "miscellaneous": trade[5],
-                    "trade_id": trade[6]
+                    "trade_id": trade[6],
                 }
                 for trade in trades_data
             ]
             for pair, trades_data in result.items()
-            if pair != 'last'
+            if pair != "last"
         }
-        values['result'] = parsed_result
+        values["result"] = parsed_result
         return values
 
     @classmethod

@@ -1,6 +1,8 @@
 # krakenfx/api/schemas/openPositionSchemas.py
-from pydantic import BaseModel, field_validator, ValidationError
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Optional, Union
+
+from pydantic import BaseModel, field_validator
+
 
 class SchemasOpenPosition(BaseModel):
     ordertxid: str  # Transaction ID of the order responsible for the position.
@@ -21,31 +23,30 @@ class SchemasOpenPosition(BaseModel):
     misc: str  # Miscellaneous information about the position.
     oflags: str  # Order flags for the position.
 
-    model_config = {
-        'from_attributes': True
-    }
+    model_config = {"from_attributes": True}
 
     def to_json(self):
         return {
-            'ordertxid': self.ordertxid,
-            'posstatus': self.posstatus,
-            'pair': self.pair,
-            'time': self.time,
-            'type': self.type,
-            'ordertype': self.ordertype,
-            'cost': self.cost,
-            'fee': self.fee,
-            'vol': self.vol,
-            'vol_closed': self.vol_closed,
-            'margin': self.margin,
-            'terms': self.terms,
-            'rollovertm': self.rollovertm,
-            'value': self.value,
-            'net': self.net,
-            'misc': self.misc,
-            'oflags': self.oflags
+            "ordertxid": self.ordertxid,
+            "posstatus": self.posstatus,
+            "pair": self.pair,
+            "time": self.time,
+            "type": self.type,
+            "ordertype": self.ordertype,
+            "cost": self.cost,
+            "fee": self.fee,
+            "vol": self.vol,
+            "vol_closed": self.vol_closed,
+            "margin": self.margin,
+            "terms": self.terms,
+            "rollovertm": self.rollovertm,
+            "value": self.value,
+            "net": self.net,
+            "misc": self.misc,
+            "oflags": self.oflags,
         }
-    
+
+
 class SchemasConsolidatedOpenPosition(BaseModel):
     pair: str  # Asset pair.
     positions: str  # Number of positions.
@@ -58,50 +59,59 @@ class SchemasConsolidatedOpenPosition(BaseModel):
     margin: str  # Initial margin level of the position.
     value: str  # Current value of the position.
     net: str  # Unrealized profit/loss of the position.
-    
+
     def to_json(self):
         return {
-            'pair': self.pair,
-            'positions': self.positions,
-            'type': self.type,
-            'leverage': self.leverage,
-            'cost': self.cost,
-            'fee': self.fee,
-            'vol': self.vol,
-            'vol_closed': self.vol_closed,
-            'margin': self.margin,
-            'value': self.value,
-            'net': self.net
+            "pair": self.pair,
+            "positions": self.positions,
+            "type": self.type,
+            "leverage": self.leverage,
+            "cost": self.cost,
+            "fee": self.fee,
+            "vol": self.vol,
+            "vol_closed": self.vol_closed,
+            "margin": self.margin,
+            "value": self.value,
+            "net": self.net,
         }
+
 
 class SchemasOpenPositions(BaseModel):
     openPositions: Dict[str, SchemasOpenPosition]
 
+
 class SchemasConsolidatedOpenPositions(BaseModel):
     consolidatedOpenPositions: List[SchemasConsolidatedOpenPosition]
+
 
 class SchemasOpenPositionReturn(BaseModel):
     openPositions: SchemasOpenPositions
     consolidatedOpenPositions: SchemasConsolidatedOpenPositions
-    
-  
+
+
 class SchemasOpenPositionResponse(BaseModel):
     error: List[str]  # List of errors returned by the API, if any.
-    result: Union[Dict[str, SchemasOpenPosition], List[SchemasConsolidatedOpenPosition]]  # Dictionary of open positions or list of consolidated open positions.
+    result: Union[
+        Dict[str, SchemasOpenPosition], List[SchemasConsolidatedOpenPosition]
+    ]  # Dictionary of open positions or list of consolidated open positions.
 
-    @field_validator('result', mode='before')
+    @field_validator("result", mode="before")
     def validate_result(cls, v):
         if isinstance(v, dict):
             return v  # It's an individual positions response
         elif isinstance(v, list):
-            if all(isinstance(item, dict) and 'pair' in item for item in v):
+            if all(isinstance(item, dict) and "pair" in item for item in v):
                 return v  # It's a consolidated positions response
-        raise ValueError('result must be a dictionary of OpenPosition objects or a list of ConsolidatedOpenPosition objects')
+        raise ValueError(
+            "result must be a dictionary of OpenPosition objects or a list of ConsolidatedOpenPosition objects"
+        )
 
     def to_json(self):
         result = self.result
         if isinstance(result, dict):
-            return {'error': [], 'result': [SchemasOpenPosition(**result)]}
+            return {"error": [], "result": [SchemasOpenPosition(**result)]}
         elif isinstance(result, list):
-            consolidated_positions = [SchemasConsolidatedOpenPosition(**pos) for pos in result]
-            return {'error': [], 'result': consolidated_positions}
+            consolidated_positions = [
+                SchemasConsolidatedOpenPosition(**pos) for pos in result
+            ]
+            return {"error": [], "result": consolidated_positions}
