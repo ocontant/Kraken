@@ -1,4 +1,5 @@
 import json
+import logging
 
 import pytest
 import pytest_asyncio
@@ -27,6 +28,7 @@ from krakenfx.utils.logger import setup_logging
 from krakenfx.utils.utils import truncated_output
 
 logger = setup_logging()
+logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 
 @pytest_asyncio.fixture(scope="function")

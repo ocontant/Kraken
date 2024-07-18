@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 import pytest_asyncio
 from sqlalchemy import select, text
@@ -22,6 +24,7 @@ from krakenfx.utils.errors import (
 from krakenfx.utils.logger import setup_logging
 
 logger = setup_logging()
+logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 
 @pytest_asyncio.fixture(scope="function")
