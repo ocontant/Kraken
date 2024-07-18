@@ -15,9 +15,9 @@ from krakenfx.repository.storeOpenPositions import process_openPositions
 from krakenfx.repository.storeOrders import process_orders
 from krakenfx.repository.storeTradeBalance import process_tradeBalance
 from krakenfx.repository.storeTradeHistory import process_tradeHistory
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_logging()
+logger = setup_main_logging()
 settings = Settings()
 
 

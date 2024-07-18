@@ -16,10 +16,10 @@ from krakenfx.utils.errors import (
     KrakenInvalidResponseStructureException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import object_as_dict
 
-logger = setup_logging()
+logger = setup_main_logging()
 
 
 @async_handle_errors

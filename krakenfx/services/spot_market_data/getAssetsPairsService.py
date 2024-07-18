@@ -22,11 +22,11 @@ from krakenfx.utils.errors import (
     KrakenNoOrdersException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import check_response_errors
 
-logger = setup_logging()
+logger = setup_main_logging()
 settings = Settings()
 
 

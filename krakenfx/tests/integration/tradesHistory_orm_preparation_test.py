@@ -19,9 +19,9 @@ from krakenfx.utils.errors import (
     KrakenInvalidResponseStructureException,
     KrakenNoOrdersException,
 )
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_logging()
+logger = setup_main_logging()
 logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 

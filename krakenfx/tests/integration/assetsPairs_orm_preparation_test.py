@@ -24,10 +24,10 @@ from krakenfx.utils.errors import (
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
 )
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import truncated_output
 
-logger = setup_logging()
+logger = setup_main_logging()
 logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 

@@ -1,5 +1,7 @@
 import inspect
 import logging
+import os
+from datetime import datetime
 
 import coloredlogs
 
@@ -8,7 +10,7 @@ from krakenfx.core.config import Settings
 settings = Settings()
 
 
-def setup_logging():
+def setup_main_logging():
     # Define custom logging levels
     TRACE_LEVEL_NUM = 5
     FLOW1_LEVEL_NUM = 25
@@ -60,7 +62,6 @@ def setup_logging():
     logging.basicConfig(
         level=numeric_level, format="%(levelname)s - %(name)s: %(message)s"
     )
-    logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
     # Configure coloredlogs with custom color settings
     coloredlogs.DEFAULT_LEVEL_STYLES = {
@@ -112,3 +113,22 @@ def setup_logging():
     logger.info(f"Current log level: {current_level}")
 
     return logger
+
+
+def setup_custom_logging(loggername: str, LOG_DIR: str = None):
+    local_logger = logging.getLogger(loggername)
+
+    # Remove existing handlers if they exist
+    if local_logger.hasHandlers():
+        local_logger.handlers.clear()
+
+    if not LOG_DIR:
+        current_date = datetime.now().strftime("%Y%m%d")
+        local_handler = logging.FileHandler(
+            os.path.join(LOG_DIR, f"{current_date}-{loggername}.log")
+        )
+    local_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    local_handler.setFormatter(local_formatter)
+    local_logger.addHandler(local_handler)
+    local_logger.setLevel(logging.INFO)
+    return local_logger

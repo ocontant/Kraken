@@ -10,9 +10,9 @@ from krakenfx.utils.errors import (
     KrakenNoOrdersException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_logging()
+logger = setup_main_logging()
 
 # Type variable for Pydantic models
 T = TypeVar("T", bound=BaseModel)

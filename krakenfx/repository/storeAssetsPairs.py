@@ -7,9 +7,9 @@ from sqlalchemy.future import select
 
 from krakenfx.repository.models.assetsPairsModel import ModelAssetsPairs
 from krakenfx.utils.errors import async_handle_errors
-from krakenfx.utils.logger import setup_logging
+from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_logging()
+logger = setup_main_logging()
 
 
 @async_handle_errors
