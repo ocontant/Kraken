@@ -6,8 +6,8 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from alembic import context
-from krakenfx.core.config import Settings
-from krakenfx.core.database import Base
+from krakenfx.utils.config import Settings
+from krakenfx.utils.database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

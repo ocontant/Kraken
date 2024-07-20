@@ -6,7 +6,6 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.tradeBalanceModel import (
     ModelTradeBalance as ORMTradeBalance,
 )
@@ -15,6 +14,7 @@ from krakenfx.services.account_data.schemas.tradebalanceSchemas import (
     SchemasTradeBalance,
 )
 from krakenfx.services.account_data.tradeBalanceService import get_tradeBalance
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

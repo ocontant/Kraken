@@ -4,9 +4,9 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.assetsPairsModel import ModelAssetsPairs
 from krakenfx.repository.models.ohlcModel import ModelOHLCAssetPair, ModelOHLCData
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

@@ -7,7 +7,6 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.assetsPairsModel import (
     ModelAssetsPairs as ORMAssetsPairs,
 )
@@ -19,6 +18,7 @@ from krakenfx.services.spot_market_data.getAssetsPairsService import (
 from krakenfx.services.spot_market_data.schemas.assetsPairsSchemas import (
     SchemasResponse,
 )
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

@@ -6,7 +6,6 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.OrderModel import ModelOrders as ORMOrder
 from krakenfx.repository.models.OrderModel import (
     ModelOrdersDescription as ORMOrderDescription,
@@ -14,6 +13,7 @@ from krakenfx.repository.models.OrderModel import (
 from krakenfx.repository.storeOrders import process_orders
 from krakenfx.services.account_data.OrderService import get_Orders
 from krakenfx.services.account_data.schemas.OrderSchemas import SchemasOrdersResult
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

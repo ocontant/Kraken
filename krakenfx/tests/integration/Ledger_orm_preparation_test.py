@@ -6,11 +6,11 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.ledgerModel import ModelLedger as ORMLedger
 from krakenfx.repository.storeLedgers import process_ledgers
 from krakenfx.services.account_data.ledgerService import get_ledgers
 from krakenfx.services.account_data.schemas.ledgerSchemas import SchemasLedgers
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

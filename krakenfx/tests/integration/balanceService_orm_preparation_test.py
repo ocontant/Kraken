@@ -6,11 +6,11 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.balanceModel import ModelBalance as ORMBalance
 from krakenfx.repository.storeBalance import process_balance
 from krakenfx.services.account_data.balanceService import get_accountBalance
 from krakenfx.services.account_data.schemas.balanceSchemas import SchemasAccountBalance
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,

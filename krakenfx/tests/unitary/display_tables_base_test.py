@@ -1,4 +1,4 @@
-from krakenfx.core.database import Base
+from krakenfx.utils.database import Base
 
 print("Tables known to declarative_base():")
 for table_name in Base.metadata.tables.keys():

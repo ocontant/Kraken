@@ -6,13 +6,13 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from krakenfx.core.database import Base
 from krakenfx.repository.models.tradeHistoryModel import ModelTradeInfo as ORMTrades
 from krakenfx.repository.storeTradeHistory import process_tradeHistory
 from krakenfx.services.account_data.schemas.tradehistorySchemas import (
     SchemasTradesReturn,
 )
 from krakenfx.services.account_data.tradesHistoryService import get_tradeHistory
+from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
