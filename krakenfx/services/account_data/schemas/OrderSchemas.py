@@ -2,6 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
+from krakenfx.utils.errors import KrakenNoItemsReturnedException
+
 
 class SchemasOrderDescription(BaseModel):
     pair: str
@@ -30,8 +32,8 @@ class SchemasOrder(BaseModel):
     cost: str
     fee: str
     price: str
-    stopprice: str
-    limitprice: str
+    stopprice: Optional[str] = None
+    limitprice: Optional[str] = None
     misc: Optional[str]
     oflags: str
     margin: Optional[bool] = None  # +
@@ -41,13 +43,9 @@ class SchemasOrder(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class SchemasOrdersList(BaseModel):
-    orders: Dict[str, SchemasOrder]
-
-
 class SchemasOrdersResult(BaseModel):
-    open: Optional[SchemasOrdersList] = None
-    closed: Optional[SchemasOrdersList] = None
+    open: Optional[Dict[str, SchemasOrder]] = None
+    closed: Optional[Dict[str, SchemasOrder]] = None
     count: Optional[int] = None
 
     model_config = {"extra": "forbid"}
@@ -55,12 +53,17 @@ class SchemasOrdersResult(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def check_one_or_the_other(cls, values):
-        open_orders = values.get("open")
-        closed_orders = values.get("closed")
-        if open_orders and closed_orders:
+        open = values.get("open")
+        closed = values.get("closed")
+        if open is not None and closed is not None:
             raise ValueError("Only one of open or closed should be provided, not both.")
-        if not open_orders and not closed_orders:
-            raise ValueError("One of open or closed must be provided.")
+
+        if open is None and closed is None:
+            raise ValueError("One of open or closed must be provided and not empty.")
+
+        if open == {}:
+            raise KrakenNoItemsReturnedException("There is no Open Order!")
+
         return values
 
 
