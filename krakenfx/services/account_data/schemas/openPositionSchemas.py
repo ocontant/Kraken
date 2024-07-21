@@ -96,7 +96,7 @@ class SchemasOpenPositionResponse(BaseModel):
     ]  # Dictionary of open positions or list of consolidated open positions.
 
     @field_validator("result", mode="before")
-    def validate_result(cls, v):
+    def validate_result(self, v):
         if isinstance(v, dict):
             return v  # It's an individual positions response
         elif isinstance(v, list):
