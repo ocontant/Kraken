@@ -1,37 +1,35 @@
 # krakenfx/services/tradebalance_service.py
 import asyncio
 import json
+import logging
 import time
 import urllib.parse
 
 import httpx
 from pydantic import ValidationError
 
-from krakenfx.core.config import Settings
+from krakenfx.di.app_container import AppContainer
 from krakenfx.services.account_data.schemas.tradebalanceSchemas import (
     SchemasTradeBalance,
     SchemasTradeBalanceResponse,
 )
+from krakenfx.utils.config import Settings
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import (
     check_response_errors,
     check_schemasResponse_empty,
 )
 
-logger = setup_main_logging()
-settings = Settings()
-
 
 @async_handle_errors
-async def get_tradeBalance():
+async def get_tradeBalance(settings: Settings):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/TradeBalance"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
@@ -55,15 +53,17 @@ async def get_tradeBalance():
         return tradeBalance
 
 
-async def main():
+async def main(settings: Settings, logger: logging.Logger):
     logger.info("Starting closedOrderService!")
-    response: SchemasTradeBalance = await get_tradeBalance()
+    response: SchemasTradeBalance = await get_tradeBalance(settings)
     return response
 
 
 if __name__ == "__main__":
     try:
-        logger.info(asyncio.run(main()))
+        logger = AppContainer().logger_container().logger()
+        settings = AppContainer().config_container().config()
+        logger.info(asyncio.run(main(settings, logger)))
     except TimeoutError as e:
         logger.error(e)
     except RuntimeError as e:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         logger.error(e)
     except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

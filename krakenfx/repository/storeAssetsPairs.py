@@ -1,15 +1,13 @@
-# krakenfx/scripts/storeAssetsPairs.py
-
 import json
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from krakenfx.di.logger_container import LoggerContainer
 from krakenfx.repository.models.assetsPairsModel import ModelAssetsPairs
 from krakenfx.utils.errors import async_handle_errors
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+logger = LoggerContainer().logger()
 
 
 @async_handle_errors

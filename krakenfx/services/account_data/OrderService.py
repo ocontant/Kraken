@@ -1,37 +1,35 @@
 import asyncio
 import json
+import logging
 import time
 import urllib.parse
 
 import httpx
 from pydantic import ValidationError
 
-from krakenfx.core.config import Settings
+from krakenfx.di.app_container import AppContainer
 from krakenfx.services.account_data.schemas.OrderSchemas import (
     SchemasOrdersResponse,
     SchemasOrdersResult,
 )
+from krakenfx.utils.config import Settings
 from krakenfx.utils.errors import (
     KrakenExceptionInvalidOrderStatus,
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import (
     check_response_errors,
     check_schemasResponse_empty,
 )
 
-logger = setup_main_logging()
-settings = Settings()
-
 
 @async_handle_errors
-async def get_Orders(order_status=str):
+async def get_Orders(settings: Settings, order_status: str):
     nonce = int(time.time() * 1000)
     match order_status:
         case "open":
@@ -44,7 +42,7 @@ async def get_Orders(order_status=str):
             )
 
     url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
-    data = {"nonce": nonce}
+    data = {"nonce": nonce, "trades": True}
     headers = {
         "API-Key": settings.KRAKEN_API_KEY,
         "API-Sign": generate_api_signature(urlpath, data, settings.KRAKEN_API_SECRET),
@@ -62,15 +60,17 @@ async def get_Orders(order_status=str):
         return Orders
 
 
-async def main(order_status=str):
-    logger.info("Starting closedOrderService!")
-    response: SchemasOrdersResult = await get_Orders(order_status)
+async def main(settings: Settings, logger: logging.Logger, order_status: str):
+    logger.info(f"Fetching {order_status.upper()} Orders!")
+    response: SchemasOrdersResult = await get_Orders(settings, order_status)
     return response
 
 
 if __name__ == "__main__":
     try:
-        logger.info(asyncio.run(main("open")))
+        logger = AppContainer().logger_container().logger()
+        settings = AppContainer().config_container().config()
+        logger.info(asyncio.run(main(settings, logger, "closed")))
     except TimeoutError as e:
         logger.error(e)
     except RuntimeError as e:
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         logger.error(e)
     except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

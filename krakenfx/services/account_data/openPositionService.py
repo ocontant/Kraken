@@ -1,39 +1,39 @@
 # krakenfx/services/open_position_service.py
 import asyncio
 import json
+import logging
 import time
 import urllib.parse
 
 import httpx
 from pydantic import ValidationError
 
-from krakenfx.core.config import Settings
+from krakenfx.di.app_container import AppContainer
 from krakenfx.services.account_data.schemas.openPositionSchemas import (
     SchemasConsolidatedOpenPositions,
     SchemasOpenPositionResponse,
     SchemasOpenPositionReturn,
     SchemasOpenPositions,
 )
+from krakenfx.utils.config import Settings
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import (
     check_response_errors,
     check_schemasResponse_empty,
 )
 
-logger = setup_main_logging()
-settings = Settings()
-
 
 @async_handle_errors
-async def fetch_openPositions(docalcs: bool = False, consolidation: str = None):
+async def fetch_openPositions(
+    settings: Settings, docalcs: bool = False, consolidation: str = None
+):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/OpenPositions"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
@@ -70,9 +70,11 @@ async def fetch_openPositions(docalcs: bool = False, consolidation: str = None):
 
 
 @async_handle_errors
-async def get_openPositions():
+async def get_openPositions(
+    settings: Settings, docalcs: bool = True, consolidation: str = None
+):
     openPositionsResponse: SchemasOpenPositionResponse = await fetch_openPositions(
-        docalcs=True, consolidation=""
+        settings, docalcs, consolidation
     )
     await check_schemasResponse_empty(openPositionsResponse)
     OpenPositions: SchemasOpenPositions = openPositionsResponse.result
@@ -93,15 +95,17 @@ async def get_openPositions():
     return OpenPositionsReturn
 
 
-async def main():
+async def main(settings: Settings, logger: logging.Logger):
     logger.info("Starting openPositionService!")
-    response: SchemasOpenPositionReturn = await get_openPositions()
+    response: SchemasOpenPositionReturn = await get_openPositions(settings)
     return response
 
 
 if __name__ == "__main__":
     try:
-        response: SchemasOpenPositionReturn = asyncio.run(main())
+        logger = AppContainer().logger_container().logger()
+        settings = AppContainer().config_container().config()
+        response: SchemasOpenPositionReturn = asyncio.run(main(settings, logger))
         logger.info(json.dumps(response.openPositions, indent=4, default=str))
         logger.info(
             json.dumps(response.consolidatedOpenPositions, indent=4, default=str)
@@ -118,7 +122,7 @@ if __name__ == "__main__":
         logger.error(e)
     except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

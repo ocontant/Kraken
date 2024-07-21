@@ -2,6 +2,7 @@ import time
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from krakenfx.di.logger_container import LoggerContainer
 from krakenfx.repository.models.tradeBalanceModel import (
     ModelTradeBalance as ORMTradeBalance,
 )
@@ -9,9 +10,8 @@ from krakenfx.services.account_data.schemas.tradebalanceSchemas import (
     SchemasTradeBalance,
 )
 from krakenfx.utils.errors import async_handle_errors
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+logger = LoggerContainer().logger()
 
 
 @async_handle_errors

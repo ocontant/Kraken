@@ -1,37 +1,36 @@
 # krakenfx/services/ticker_service.py
+import argparse
 import asyncio
 import json
+import logging
 import time
 import urllib.parse
 
 import httpx
 from pydantic import ValidationError
 
-from krakenfx.core.config import Settings
+from krakenfx.di.app_container import AppContainer
 from krakenfx.services.spot_market_data.schemas.tickerSchemas import (
     TickerInfo,
     TickerResult,
 )
+from krakenfx.utils.config import Settings
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import (
     check_response_errors,
     check_schemasResponse_empty,
 )
 
-logger = setup_main_logging()
-settings = Settings()
-
 
 @async_handle_errors
-async def get_ticker_information(pair: str):
+async def get_ticker_information(settings: Settings, pair: str):
     nonce = int(time.time() * 1000)
     urlpath = "/0/public/Ticker"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
@@ -55,16 +54,29 @@ async def get_ticker_information(pair: str):
         return ticker_info
 
 
-async def main():
-    pair = "XXBTZUSD"  # Example pair, change as needed
-    logger.info(f"Get Ticker Information for pair {pair} from Kraken server!")
-    response = await get_ticker_information(pair)
+async def main(settings: Settings, logger: logging.Logger):
+    parser = argparse.ArgumentParser(description="Get a ledger entry information")
+    parser.add_argument(
+        "-q",
+        "--asset_pair",
+        type=str,
+        default="XXBTZUSD",
+        help="Comma delimited asset pairs to get fees information.",
+        required=False,
+    )
+    args = parser.parse_args()
+    logger.info(
+        f"Get Ticker Information for pair {args.asset_pair} from Kraken server!"
+    )
+    response = await get_ticker_information(settings, args.asset_pair)
     return response
 
 
 if __name__ == "__main__":
     try:
-        response = asyncio.run(main())
+        logger = AppContainer().logger_container().logger()
+        settings = AppContainer().config_container().config()
+        response = asyncio.run(main(settings, logger))
         logger.info(json.dumps(response.model_dump(), indent=4, default=str))
 
     except TimeoutError as e:
@@ -79,7 +91,7 @@ if __name__ == "__main__":
         logger.error(e)
     except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

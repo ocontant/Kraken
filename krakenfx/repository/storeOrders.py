@@ -1,29 +1,36 @@
 import json
+from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from krakenfx.di.app_container import AppContainer
 from krakenfx.repository.models.OrderModel import ModelOrders as ORMOrder
 from krakenfx.repository.models.OrderModel import (
     ModelOrdersDescription as ORMOrderDescription,
 )
+from krakenfx.repository.models.tradesModel import ModelTradeInfo as ORMTradeInfo
+from krakenfx.services.account_data.queryTradesService import get_queryTrades
 from krakenfx.services.account_data.schemas.OrderSchemas import (
     SchemasOrder,
     SchemasOrderDescription,
     SchemasOrdersResult,
 )
+from krakenfx.services.account_data.schemas.tradesSchemas import (
+    SchemasQueryTradesResponse,
+)
 from krakenfx.utils.errors import (
     KrakenInvalidResponseStructureException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import object_as_dict
 
-logger = setup_main_logging()
+app_container = AppContainer()
+
+logger = app_container.logger_container().logger()
 
 
 @async_handle_errors
-# async def process_orders(OrdersResult: SchemasOrdersResult, order_status: str, session: AsyncSession):
 async def process_orders(Orders: SchemasOrdersResult, session: AsyncSession):
     logger.info("Processing Orders.")
 
@@ -58,7 +65,7 @@ async def check_Order_has_descr(order_id: str, Order: SchemasOrder):
 
 
 @async_handle_errors
-async def store_Order(order_id, Order: SchemasOrder, session: AsyncSession):
+async def store_Order(order_id: str, Order: SchemasOrder, session: AsyncSession):
     logger.flow1(f"Processing Order ID: {order_id}")
 
     # Check if the order exists
@@ -91,8 +98,12 @@ async def store_Order(order_id, Order: SchemasOrder, session: AsyncSession):
                 logger.trace(
                     f"L-> Order Description ID {orm_order_descr.id} - Field {key} updated to {value}"
                 )
-
         logger.flow2(f"Order ID {order_id} updated.")
+
+        # Validate relations dependencies
+        # if Order.trades:
+        #     await update_order_trades(order_id, Order.trades, orm_order, session)
+        #     logger.flow2(f"Trades ID {Order.trades} updated.")
     else:
         # Order doesn't exist, create a new order
         logger.flow2(f"Order ID {order_id} not found. Creating new order.")
@@ -125,11 +136,13 @@ async def store_Order(order_id, Order: SchemasOrder, session: AsyncSession):
         )
         logger.flow2(f"L-> Adding Order ID {orm_Order.id} to session.")
 
-        logger.flow2(f"Order ID {order_id} created.")
-
         session.add(orm_OrderDescr)
         session.add(orm_Order)
 
+        # Validate relations dependencies
+        # if Order.trades:
+        #     await update_order_trades(order_id, Order.trades, orm_Order, session)
+        #     logger.flow2(f"Order ID {order_id} created.")
     await session.flush()
     logger.flow1(f"L-> Finished processing orders ID {order_id}.")
 
@@ -161,8 +174,42 @@ async def create_orm_Order_withoutDescr(
             "trades"
         ]  # Need to remove the trades list() trades from the schemas in preparation to ORM
 
-    orm_Order = ORMOrder(descr_id=orm_OrderDescr.id, id=order_id, **Order_dict)
+    orm_Order = ORMOrder(id=order_id, descr_id=orm_OrderDescr.id, **Order_dict)
     return orm_Order
+
+
+@async_handle_errors
+async def update_order_trades(
+    order_id: str, trade_ids: List[str], orm_order: ORMOrder, session: AsyncSession
+):
+
+    # Issue building relations between tables:
+    ## Error:
+    ##   Failed: General exception occurred: greenlet_spawn has not been called; can't call await_only() here.
+    ##           Was IO attempted in an unexpected place?
+    ## References: https://stackoverflow.com/questions/74252768/missinggreenlet-greenlet-spawn-has-not-been-called
+
+    # Find or create TradeInfo entries and associate them with the order
+    for trade_id in trade_ids:
+        trade = await session.execute(
+            select(ORMTradeInfo).where(ORMTradeInfo.trade_id == trade_id)
+        )
+        orm_trade_info = trade.scalar_one_or_none()
+
+        if not orm_trade_info:
+            trade_info_queryResponse: SchemasQueryTradesResponse = (
+                await get_queryTrades(
+                    app_container.config_container().config(), trade_id
+                )
+            )
+
+            for id, trade_info in trade_info_queryResponse.items():
+                orm_trade_info = ORMTradeInfo(id=id, **trade_info.model_dump())
+            session.add(orm_trade_info)
+        orm_order.rel_trades.append(orm_trade_info)
+    await session.flush()
+
+    logger.flow2(f"L-> Order ID {order_id} - Trades updated: {trade_ids}")
 
 
 if __name__ == "__main__":

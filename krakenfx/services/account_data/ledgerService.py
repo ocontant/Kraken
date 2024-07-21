@@ -1,37 +1,35 @@
 # krakenfx/services/ledger_service.py
 import asyncio
 import json
+import logging
 import time
 import urllib.parse
 
 import httpx
 from pydantic import ValidationError
 
-from krakenfx.core.config import Settings
+from krakenfx.di.app_container import AppContainer
 from krakenfx.services.account_data.schemas.ledgerSchemas import (
     SchemasLedgerResponse,
     SchemasLedgers,
 )
+from krakenfx.utils.config import Settings
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import generate_api_signature
 from krakenfx.utils.validations import (
     check_response_errors,
     check_schemasResponse_empty,
 )
 
-logger = setup_main_logging()
-settings = Settings()
-
 
 @async_handle_errors
-async def get_ledgers():
+async def get_ledgers(settings: Settings):
     nonce = int(time.time() * 1000)
     urlpath = "/0/private/Ledgers"
     url = settings.KRAKEN_API_URL.unicode_string().rstrip("/") + urlpath
@@ -55,15 +53,17 @@ async def get_ledgers():
         return ledgersReturn
 
 
-async def main():
+async def main(settings: Settings, logger: logging.Logger):
     logger.info("Starting Ledgers Service!")
-    response: SchemasLedgers = await get_ledgers()
+    response: SchemasLedgers = await get_ledgers(settings)
     return response
 
 
 if __name__ == "__main__":
     try:
-        logger.info(asyncio.run(main()))
+        logger = AppContainer().logger_container().logger()
+        settings = AppContainer().config_container().config()
+        logger.info(asyncio.run(main(settings, logger)))
     except TimeoutError as e:
         logger.error(e)
     except RuntimeError as e:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         logger.error(e)
     except KrakenInvalidResponseStructureException as e:
         logger.error(e)
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         logger.error(e)
     except ValidationError as e:
         error = json.dumps(e.errors(), indent=4)

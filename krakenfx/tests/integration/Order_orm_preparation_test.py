@@ -3,9 +3,9 @@ import logging
 import pytest
 import pytest_asyncio
 from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
+from krakenfx.di.app_container import AppContainer
+from krakenfx.repository.models._base import Base
 from krakenfx.repository.models.OrderModel import ModelOrders as ORMOrder
 from krakenfx.repository.models.OrderModel import (
     ModelOrdersDescription as ORMOrderDescription,
@@ -13,22 +13,27 @@ from krakenfx.repository.models.OrderModel import (
 from krakenfx.repository.storeOrders import process_orders
 from krakenfx.services.account_data.OrderService import get_Orders
 from krakenfx.services.account_data.schemas.OrderSchemas import SchemasOrdersResult
-from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
 )
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+container = AppContainer()
+
+# Retrieve the logger from the container
+logger = container.logger_container().logger()
 logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 
 @pytest_asyncio.fixture(scope="function")
 async def engine():
-    return create_async_engine("sqlite+aiosqlite:///:memory:", future=True, echo=True)
+    return (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_engine()
+    )
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -41,9 +46,11 @@ async def create_tables(engine):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session(engine):
-    async_session = sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
+async def db_session():
+    async_session = (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_session_factory()
     )
     async with async_session() as session:
         yield session
@@ -68,9 +75,9 @@ async def test_OrderService_orm_preparation(db_session):
         order_status = "closed"
 
         logger.flow1("Starting Test")
-        Orders: SchemasOrdersResult = await get_Orders(order_status)
+        settings = container.config_container().config()
+        Orders: SchemasOrdersResult = await get_Orders(settings, order_status)
 
-        # await process_orders(OrdersResult, 'open', db_session)
         await process_orders(Orders, db_session)
         await display_data_model(db_session)
 
@@ -79,7 +86,7 @@ async def test_OrderService_orm_preparation(db_session):
             select(ORMOrder).where(ORMOrder.id == "O4AGJU-R6VH2-IY3ZC5")
         )
         order = result.scalars().first()
-        if result is None:
+        if order is None:
             pytest.fail(
                 "No result found in the table order for id 'O4AGJU-R6VH2-IY3ZC5'"
             )
@@ -90,7 +97,7 @@ async def test_OrderService_orm_preparation(db_session):
             )
         )
         order_descr = result_descr.scalars().first()
-        if result_descr is None:
+        if order_descr is None:
             pytest.fail(
                 "No result found in the table order_descriptions for id 'O4AGJU-R6VH2-IY3ZC5'"
             )
@@ -132,7 +139,7 @@ async def test_OrderService_orm_preparation(db_session):
         pytest.fail(str(e))
     except KrakenInvalidResponseStructureException as e:
         pytest.fail(str(e))
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         pytest.fail(str(e))
     except ValueError as e:
         pytest.fail(str(e))

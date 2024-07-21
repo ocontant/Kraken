@@ -4,19 +4,16 @@ import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from krakenfx.repository.models.tradeHistoryModel import ModelTradeInfo as ORMTradeInfo
-from krakenfx.repository.models.tradeHistoryModel import (
-    ModelTradesHistory as ORMTradeHistory,
-)
-from krakenfx.services.account_data.schemas.tradehistorySchemas import (
+from krakenfx.di.logger_container import LoggerContainer
+from krakenfx.repository.models.tradesModel import ModelTradeInfo as ORMTradeInfo
+from krakenfx.services.account_data.schemas.tradesSchemas import (
     SchemasTradeInfo,
     SchemasTradesReturn,
 )
 from krakenfx.utils.errors import async_handle_errors
-from krakenfx.utils.logger import setup_main_logging
 from krakenfx.utils.utils import object_as_dict
 
-logger = setup_main_logging()
+logger = LoggerContainer().logger()
 
 
 @async_handle_errors
@@ -39,35 +36,21 @@ async def process_tradeHistory(Trades: SchemasTradesReturn, session: AsyncSessio
 async def store_trade(trade_id: str, trade: SchemasTradeInfo, session: AsyncSession):
     logger.flow1(f"Processing Trade ID: {trade_id}")
 
-    # Check if the trade history exists in the database
-    resultTradeHistory = await session.execute(
-        select(ORMTradeHistory).where(ORMTradeHistory.id == trade_id)
-    )
-    orm_trade_history = resultTradeHistory.scalar_one_or_none()
-
     resultTradeInfo = await session.execute(
         select(ORMTradeInfo).where(ORMTradeInfo.id == trade_id)
     )
     orm_tradeInfo = resultTradeInfo.scalar_one_or_none()
 
-    if orm_trade_history and orm_tradeInfo:
+    if orm_tradeInfo:
         # Trade History exists, update only the trade fields that are different
         logger.flow2(f"Trade ID {trade_id} found. Updating trade.")
 
         trade_dict = trade.model_dump()
         for key, value in trade_dict.items():
-            if (
-                hasattr(orm_trade_history, key)
-                and getattr(orm_trade_history, key) != value
-            ):
-                setattr(orm_trade_history, key, value)
-                logger.trace(
-                    f"L-> Trade ID {trade_id} - Field {key} updated to {value}"
-                )
-            elif hasattr(orm_tradeInfo, key) and getattr(orm_tradeInfo, key) != value:
+            if hasattr(orm_tradeInfo, key) and getattr(orm_tradeInfo, key) != value:
                 setattr(orm_tradeInfo, key, value)
                 logger.trace(
-                    f"L-> TradeInfo ID {orm_trade_history.tradeinfo_id} - Field {key} updated to {value}"
+                    f"L-> TradeInfo ID {orm_tradeInfo.tradeinfo_id} - Field {key} updated to {value}"
                 )
 
         logger.flow2(f"Trade ID {trade_id} updated.")
@@ -87,20 +70,6 @@ async def store_trade(trade_id: str, trade: SchemasTradeInfo, session: AsyncSess
         logger.flow2(f"L-> Adding TradeInfo ID {orm_tradeInfo.id} to session.")
         session.add(orm_tradeInfo)
 
-        orm_trade_history = await create_orm_tradeHistory(
-            trade_id, trade, orm_tradeInfo
-        )
-        logger.trace(
-            "L-> Variable: store_trade().orm_trade_history:\n{}".format(
-                json.dumps(object_as_dict(orm_trade_history), indent=4, default=str)
-            )
-        )
-        logger.trace(
-            f"Table name of {orm_trade_history.__class__.__name__}: {orm_trade_history.__tablename__}"
-        )
-        logger.flow2(f"L-> Adding TradeHistory ID {orm_trade_history.id} to session.")
-        session.add(orm_trade_history)
-
     await session.flush()
     logger.flow1(f"L-> Finished processing Trade ID {trade_id}.")
 
@@ -114,19 +83,6 @@ async def create_orm_tradeInfo(trade_id: str, trade: SchemasTradeInfo) -> ORMTra
             setattr(orm_trade_info, key, value)
 
     return orm_trade_info
-
-
-async def create_orm_tradeHistory(
-    trade_id: str, trade: SchemasTradeInfo, orm_tradeInfo: ORMTradeInfo
-) -> ORMTradeHistory:
-    orm_trade_history = ORMTradeHistory(id=trade_id, tradeinfo_id=orm_tradeInfo.id)
-    trade_dict = trade.model_dump()
-
-    for key, value in trade_dict.items():
-        if hasattr(orm_trade_history, key):
-            setattr(orm_trade_history, key, value)
-
-    return orm_trade_history
 
 
 if __name__ == "__main__":

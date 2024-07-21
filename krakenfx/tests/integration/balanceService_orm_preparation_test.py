@@ -3,29 +3,34 @@ import logging
 import pytest
 import pytest_asyncio
 from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
+from krakenfx.di.app_container import AppContainer
+from krakenfx.repository.models import Base
 from krakenfx.repository.models.balanceModel import ModelBalance as ORMBalance
 from krakenfx.repository.storeBalance import process_balance
 from krakenfx.services.account_data.balanceService import get_accountBalance
 from krakenfx.services.account_data.schemas.balanceSchemas import SchemasAccountBalance
-from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
 )
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+container = AppContainer()
+
+# Retrieve the logger from the container
+logger = container.logger_container().logger()
 logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 
 @pytest_asyncio.fixture(scope="function")
 async def engine():
-    return create_async_engine("sqlite+aiosqlite:///:memory:", future=True, echo=True)
+    return (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_engine()
+    )
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -38,9 +43,11 @@ async def create_tables(engine):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session(engine):
-    async_session = sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
+async def db_session():
+    async_session = (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_session_factory()
     )
     async with async_session() as session:
         yield session
@@ -59,7 +66,8 @@ async def test_balanceService_orm_preparation(db_session):
     try:
         logger.flow1("Starting Test")
         # OrdersResult = OrdersResponse.result
-        Balances: SchemasAccountBalance = await get_accountBalance()
+        settings = container.config_container().config()
+        Balances: SchemasAccountBalance = await get_accountBalance(settings)
 
         # await process_balance(Balances, db_session)
         await process_balance(Balances, db_session)
@@ -84,7 +92,7 @@ async def test_balanceService_orm_preparation(db_session):
         pytest.fail(str(e))
     except KrakenInvalidResponseStructureException as e:
         pytest.fail(str(e))
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         pytest.fail(str(e))
     except ValueError as e:
         pytest.fail(str(e))
