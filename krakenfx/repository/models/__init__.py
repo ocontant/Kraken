@@ -2,14 +2,11 @@ import importlib
 import pkgutil
 from pathlib import Path
 
-from sqlalchemy.orm import declarative_base
-
+from krakenfx.di.logger_container import LoggerContainer
+from krakenfx.repository.models._base import Base
 from krakenfx.utils.errors import handle_errors
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
-
-Base = declarative_base()
+logger = LoggerContainer().logger()
 
 
 @handle_errors

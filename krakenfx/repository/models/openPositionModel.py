@@ -2,7 +2,7 @@
 from sqlalchemy import Column, Float, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
 
 
 class ModelOpenPosition(Base):

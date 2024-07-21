@@ -1,36 +1,29 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    Float,
-    String,
-    BigInteger,
-    ForeignKey,
-    Index,
-    create_engine,
-)
-from sqlalchemy.orm import relationship, declarative_base, sessionmaker
+from sqlalchemy import BigInteger, Column, Float, ForeignKey, Index, Integer, String
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from krakenfx.repository.models._base import Base
 
 
-class AssetPair(Base):
-    __tablename__ = "asset_pairs"
+class ModelOHLCAssetPair(Base):
+    __tablename__ = "ohlc_asset_pairs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(
+        String, ForeignKey("assets_pairs.pair_name"), unique=True, nullable=False
+    )
 
-    ohlc_data = relationship("OHLCData", back_populates="asset_pair")
-    ohlc_results = relationship("OHLCResult", back_populates="asset_pair")
+    rel_ohlc_data = relationship("ModelOHLCData", back_populates="rel_asset_pair")
+    rel_ohlc_results = relationship("ModelOHLCResult", back_populates="rel_asset_pair")
 
     def __init__(self, name):
         self.name = name
 
 
-class OHLCData(Base):
+class ModelOHLCData(Base):
     __tablename__ = "ohlc_data"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    asset_pair_id = Column(Integer, ForeignKey("asset_pairs.id"), nullable=False)
+    asset_pair_id = Column(Integer, ForeignKey("ohlc_asset_pairs.id"), nullable=False)
     time = Column(BigInteger, nullable=False, index=True)
     open = Column(Float, nullable=False)
     high = Column(Float, nullable=False)
@@ -40,7 +33,7 @@ class OHLCData(Base):
     volume = Column(Float, nullable=False)
     count = Column(Integer, nullable=False)
 
-    asset_pair = relationship("AssetPair", back_populates="ohlc_data")
+    rel_asset_pair = relationship("ModelOHLCAssetPair", back_populates="rel_ohlc_data")
 
     def __init__(
         self, asset_pair_id, time, open, high, low, close, vwap, volume, count
@@ -57,17 +50,19 @@ class OHLCData(Base):
 
 
 # Adding index to improve query performance
-Index("idx_asset_pair_time", OHLCData.asset_pair_id, OHLCData.time)
+Index("idx_ohlc_data_asset_pair_time", ModelOHLCData.asset_pair_id, ModelOHLCData.time)
 
 
-class OHLCResult(Base):
+class ModelOHLCResult(Base):
     __tablename__ = "ohlc_results"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    asset_pair_id = Column(Integer, ForeignKey("asset_pairs.id"), nullable=False)
+    asset_pair_id = Column(Integer, ForeignKey("ohlc_asset_pairs.id"), nullable=False)
     last = Column(BigInteger, nullable=False)
 
-    asset_pair = relationship("AssetPair", back_populates="ohlc_results")
+    rel_asset_pair = relationship(
+        "ModelOHLCAssetPair", back_populates="rel_ohlc_results"
+    )
 
     def __init__(self, asset_pair_id, last):
         self.asset_pair_id = asset_pair_id

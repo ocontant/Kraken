@@ -1,7 +1,7 @@
 # krakenfx/api/models/ledger.py
 from sqlalchemy import Column, Float, String
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
 
 
 class ModelLedger(Base):

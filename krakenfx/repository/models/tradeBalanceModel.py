@@ -1,7 +1,7 @@
 # krakenfx/api/models/tradeBalanceModel.py
 from sqlalchemy import Column, Float, Integer, String
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
 
 
 class ModelTradeBalance(Base):

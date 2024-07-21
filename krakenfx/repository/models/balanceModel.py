@@ -1,7 +1,7 @@
 # krakenfx/api/models/balance.py
 from sqlalchemy import Column, String
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
 
 
 class ModelBalance(Base):

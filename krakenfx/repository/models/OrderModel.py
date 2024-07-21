@@ -1,7 +1,9 @@
 from sqlalchemy import Column, Float, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
+
+# from krakenfx.repository.models.associationsTablesModel import order_trade_association
 
 
 class ModelOrdersDescription(Base):
@@ -20,7 +22,7 @@ class ModelOrdersDescription(Base):
     fk_orders = relationship("ModelOrders", uselist=False, back_populates="fk_descr")
 
     def __repr__(self):
-        return f"ConsolidatedOpenPosition(id={self.id}, pair={self.pair}, price={self.price})"
+        return f"id={self.id}, pair={self.pair}, price={self.price}"
 
 
 class ModelOrders(Base):
@@ -40,16 +42,34 @@ class ModelOrders(Base):
     cost = Column(String, nullable=False)
     fee = Column(String, nullable=False)
     price = Column(String, nullable=False)
-    stopprice = Column(String, nullable=False)
-    limitprice = Column(String, nullable=False)
+    stopprice = Column(String, nullable=True)
+    limitprice = Column(String, nullable=True)
     misc = Column(String, nullable=True)
     oflags = Column(String, nullable=False)
     margin = Column(String, nullable=True)
     reason = Column(String, nullable=True)
+    trades = Column(String, nullable=True)
 
     fk_descr = relationship(
-        "ModelOrdersDescription", uselist=False, back_populates="fk_orders"
+        "ModelOrdersDescription",
+        uselist=False,
+        back_populates="fk_orders",
+        lazy="selectin",
     )
 
+    # Issue building relations between tables:
+    ## Error: Failed: General exception occurred: greenlet_spawn has not been called; can't call await_only() here.
+    ##                Was IO attempted in an unexpected place?
+    ## References: https://stackoverflow.com/questions/74252768/missinggreenlet-greenlet-spawn-has-not-been-called
+
+    # rel_trades = relationship(
+    #     "ModelTradeInfo",
+    #     secondary=order_trade_association,
+    #     back_populates="rel_orders",
+    #     lazy="subquery",
+    # )
+
     def __repr__(self):
-        return f"ConsolidatedOpenPosition(id={self.id}, status={self.status}, cost={self.cost}, price={self.price})"
+        return (
+            f"id={self.id}, status={self.status}, cost={self.cost}, price={self.price}"
+        )
