@@ -2,7 +2,7 @@
 name = "krakenfx"
 version = "0.1.0"
 description = ""
-authors = ["Olivier Contant <ocontant@cloudoric.com>"]
+authors = ["Olivier Contant <contant.olivier@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -17,6 +17,13 @@ psycopg2-binary = "^2.9.9"
 pydantic-settings = "^2.2.1"
 greenlet = "^3.0.3"
 coloredlogs = "^15.0.1"
+pytz = "^2024.1"
+dependency-injector = "^4.41.0"
+pylint-quotes = "^0.2.3"
+pylint-protobuf = "^0.22.0"
+autoflake = "^2.3.1"
+blacken-docs = "^1.18.0"
+isort = "^5.13.2"
 
 
 
