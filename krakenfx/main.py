@@ -3,7 +3,7 @@ import asyncio
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from .DI.dependency_injection import Container
+from .di.app_container import AppContainer
 from .repository.storeAssetsPairs import process_asset_pairs
 
 # Could benefit Factory design pattern
@@ -20,7 +20,7 @@ from .utils.logger import setup_main_logging
 logger = setup_main_logging()
 
 # Defining dependency injector pattern & Wire application components
-container = Container()
+container = AppContainer()
 container.wire(
     modules=[
         "krakenfx.services.account_data.OrderService",
