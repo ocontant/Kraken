@@ -38,10 +38,10 @@ class KrakenExceptionInvalidOrderStatus(Exception):
         super().__init__(self.message)
 
 
-class KrakenNoOrdersException(Exception):
+class KrakenNoItemsReturnedException(Exception):
     """Utilities for handling errors in KrakenFX."""
 
-    def __init__(self, message=f"KrakenNoOrdersException: {Exception}"):
+    def __init__(self, message=f"KrakenNoItemsReturnedException: {Exception}"):
         self.message = message
         super().__init__(self.message)
 
@@ -60,8 +60,8 @@ def async_handle_errors(func):
             raise RuntimeError(e) from e
         except ConnectionError as e:
             raise ConnectionError(e) from e
-        except KrakenNoOrdersException as e:
-            raise KrakenNoOrdersException(e) from e
+        except KrakenNoItemsReturnedException as e:
+            raise KrakenNoItemsReturnedException(e) from e
         except KrakenFetchResponseException as e:
             raise KrakenFetchResponseException(e) from e
         except KrakenInvalidAPIKeyException as e:
@@ -90,8 +90,8 @@ def handle_errors(func):
             raise RuntimeError(e) from e
         except ConnectionError as e:
             raise ConnectionError(e) from e
-        except KrakenNoOrdersException as e:
-            raise KrakenNoOrdersException(e) from e
+        except KrakenNoItemsReturnedException as e:
+            raise KrakenNoItemsReturnedException(e) from e
         except KrakenFetchResponseException as e:
             raise KrakenFetchResponseException(e) from e
         except KrakenInvalidAPIKeyException as e:
