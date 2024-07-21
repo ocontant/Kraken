@@ -3,22 +3,46 @@ import asyncio
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from krakenfx.core.config import Settings
-from krakenfx.repository.storeAssetsPairs import process_asset_pairs
+from .DI.dependency_injection import Container
+from .repository.storeAssetsPairs import process_asset_pairs
 
 # Could benefit Factory design pattern
 #   An attributes could be define for each repository script to define interval
 #   A loop could replace import and scheduler definition
-from krakenfx.repository.storeBalance import process_balance
-from krakenfx.repository.storeLedgers import process_ledgers
-from krakenfx.repository.storeOpenPositions import process_openPositions
-from krakenfx.repository.storeOrders import process_orders
-from krakenfx.repository.storeTradeBalance import process_tradeBalance
-from krakenfx.repository.storeTradeHistory import process_tradeHistory
-from krakenfx.utils.logger import setup_main_logging
+from .repository.storeBalance import process_balance
+from .repository.storeLedgers import process_ledgers
+from .repository.storeOpenPositions import process_openPositions
+from .repository.storeOrders import process_orders
+from .repository.storeTradeBalance import process_tradeBalance
+from .repository.storeTradeHistory import process_tradeHistory
+from .utils.logger import setup_main_logging
 
 logger = setup_main_logging()
-settings = Settings()
+
+# Defining dependency injector pattern & Wire application components
+container = Container()
+container.wire(
+    modules=[
+        "krakenfx.services.account_data.OrderService",
+        "krakenfx.services.account_data.balanceService",
+        "krakenfx.services.account_data.ledgerService",
+        "krakenfx.services.account_data.openPositionService",
+        "krakenfx.services.account_data.queryLedgersService",
+        "krakenfx.services.account_data.queryOrdersService",
+        "krakenfx.services.account_data.queryTradesService",
+        "krakenfx.services.account_data.tradeBalanceService",
+        "krakenfx.services.account_data.tradeVolumeService",
+        "krakenfx.services.account_data.tradesHistoryService",
+        "krakenfx.services.spot_market_data.getAssetsPairsService",
+        "krakenfx.services.spot_market_data.getAssetsService",
+        "krakenfx.services.spot_market_data.getDepthService",
+        "krakenfx.services.spot_market_data.getSpreadsService",
+        "krakenfx.services.spot_market_data.getSystemStatusService",
+        "krakenfx.services.spot_market_data.getTickerService",
+        "krakenfx.services.spot_market_data.getTimeService",
+        "krakenfx.services.spot_market_data.getTradesService",
+    ]
+)
 
 
 async def main():
