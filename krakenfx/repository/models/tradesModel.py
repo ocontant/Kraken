@@ -1,15 +1,19 @@
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, Float, Integer, String
 
-from krakenfx.repository.models import Base
+from krakenfx.repository.models._base import Base
+
+# from sqlalchemy.orm import relationship
+
+
+# from krakenfx.repository.models.associationsTablesModel import order_trade_association
 
 
 class ModelTradeInfo(Base):
     __tablename__ = "trade_info"
 
     id = Column(String, primary_key=True, index=True, nullable=True)
-    trade_id = Column(Integer, nullable=False)
-    ordertxid = Column(String, ForeignKey("orders.id"), nullable=False)
+    trade_id = Column(Integer, nullable=False)  # Unused, always 0
+    ordertxid = Column(String, nullable=False)
     postxid = Column(String, nullable=False)
     pair = Column(String, nullable=False)
     time = Column(Float, nullable=False)
@@ -23,16 +27,28 @@ class ModelTradeInfo(Base):
     leverage = Column(String, nullable=True)
     misc = Column(String, nullable=True)
     maker = Column(Boolean, nullable=False)
+    posstatus = Column(String, nullable=True)
+    cprice = Column(Float, nullable=True)
+    ccost = Column(Float, nullable=True)
+    cfee = Column(Float, nullable=True)
+    cvol = Column(Float, nullable=True)
+    cmargin = Column(Float, nullable=True)
+    net = Column(Float, nullable=True)
+    trades = Column(String, nullable=True)
 
-    fk_order = relationship("ModelOrders", uselist=False)
-    fk_tradeHistory = relationship(
-        "ModelTradesHistory", uselist=False, back_populates="fk_trade"
-    )
+    # Issue building relations between tables:
+    ## Error: Failed: General exception occurred: greenlet_spawn has not been called; can't call await_only() here.
+    ##                Was IO attempted in an unexpected place?
+    ## References: https://stackoverflow.com/questions/74252768/missinggreenlet-greenlet-spawn-has-not-been-called
 
-
-class ModelTradesHistory(Base):
+    # rel_orders = relationship(
+    #     "ModelOrders",
+    #     secondary=order_trade_association,
+    #     back_populates="rel_trades",
+    #     lazy="subquery",
+    # )
     """
-    Model for the Trades History:
+    Model for the Trades:
 
     Attributes:
         id: Unique identifier primary key
@@ -59,19 +75,3 @@ class ModelTradesHistory(Base):
         cmargin: Total margin freed in closed portion of position (quote currency).
         net: Net profit/loss of closed portion of position (quote currency, quote currency scale).
     """
-
-    __tablename__ = "trades_history"
-
-    id = Column(String, primary_key=True, index=True, nullable=True)
-    tradeinfo_id = Column(String, ForeignKey("trade_info.id"), nullable=False)
-    posstatus = Column(String, nullable=True)
-    cprice = Column(Float, nullable=True)
-    ccost = Column(Float, nullable=True)
-    cfee = Column(Float, nullable=True)
-    cvol = Column(Float, nullable=True)
-    cmargin = Column(Float, nullable=True)
-    net = Column(Float, nullable=True)
-
-    fk_trade = relationship(
-        "ModelTradeInfo", uselist=False, back_populates="fk_tradeHistory"
-    )
