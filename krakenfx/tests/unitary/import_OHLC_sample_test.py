@@ -1,26 +1,34 @@
+import logging
+
 import pytest
 import pytest_asyncio
 from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
+from krakenfx.di.app_container import AppContainer
+from krakenfx.repository.models._base import Base
 from krakenfx.repository.models.assetsPairsModel import ModelAssetsPairs
 from krakenfx.repository.models.ohlcModel import ModelOHLCAssetPair, ModelOHLCData
-from krakenfx.utils.database import Base
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
 )
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+container = AppContainer()
+
+# Retrieve the logger from the container
+logger = container.logger_container().logger()
+logging.getLogger("aiosqlite").setLevel(logging.WARNING)
 
 
 @pytest_asyncio.fixture(scope="function")
 async def engine():
-    return create_async_engine("sqlite+aiosqlite:///:memory:", future=True, echo=True)
+    return (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_engine()
+    )
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -33,15 +41,17 @@ async def create_tables(engine):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session(engine):
-    async_session = sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
+async def db_session():
+    async_session = (
+        await container.database_container()
+        .database_factory()
+        .get_sqlite_memory_async_session_factory()
     )
     async with async_session() as session:
         yield session
 
 
-async def display_data_model(asset_pair_id: int, session: AsyncSession):
+async def display_data_model(session):
     # Display data from the order table
     results = await session.execute(text("SELECT * FROM ohlc_data"))
     rows = results.fetchall()
@@ -160,7 +170,7 @@ async def test_ohlc_data(db_session):
         db_session.add_all(ohlc_data)
         await db_session.commit()
 
-        await display_data_model(ohlc_asset_pair_id, db_session)
+        await display_data_model(db_session)
 
         # Query the data
         query_result = await db_session.execute(
@@ -207,7 +217,7 @@ async def test_ohlc_data(db_session):
         pytest.fail(str(e))
     except KrakenInvalidResponseStructureException as e:
         pytest.fail(str(e))
-    except KrakenNoOrdersException as e:
+    except KrakenNoItemsReturnedException as e:
         pytest.fail(str(e))
     except ValueError as e:
         pytest.fail(str(e))
