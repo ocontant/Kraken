@@ -3,16 +3,16 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
+from krakenfx.di.logger_container import LoggerContainer
 from krakenfx.utils.errors import (
     KrakenFetchResponseException,
     KrakenInvalidAPIKeyException,
     KrakenInvalidResponseStructureException,
-    KrakenNoOrdersException,
+    KrakenNoItemsReturnedException,
     async_handle_errors,
 )
-from krakenfx.utils.logger import setup_main_logging
 
-logger = setup_main_logging()
+logger = LoggerContainer().logger()
 
 # Type variable for Pydantic models
 T = TypeVar("T", bound=BaseModel)
@@ -53,8 +53,8 @@ async def check_schemasResponse_empty(
                         json.dumps(response.model_dump(), indent=4)
                     )
                 )
-                raise KrakenNoOrdersException(
-                    "KrakenNoOrdersException: No items found! Order: 0"
+                raise KrakenNoItemsReturnedException(
+                    "KrakenNoItemsReturnedException: No items found! Return: 0"
                 )
         else:
             raise KrakenInvalidResponseStructureException(
@@ -68,8 +68,8 @@ async def check_schemasResponse_empty(
                     json.dumps(response.model_dump(), indent=4)
                 )
             )
-            raise KrakenNoOrdersException(
-                f"KrakenNoOrdersException: No items found! Order: {len(response_field)}"
+            raise KrakenNoItemsReturnedException(
+                f"KrakenNoItemsReturnedException: No items found! Order: {len(response_field)}"
             )
     else:
         raise KrakenInvalidResponseStructureException(

@@ -5,12 +5,10 @@ from datetime import datetime
 
 import coloredlogs
 
-from krakenfx.core.config import Settings
-
-settings = Settings()
+from krakenfx.utils.config import Settings
 
 
-def setup_main_logging():
+def setup_main_logging(settings: Settings):
     # Define custom logging levels
     TRACE_LEVEL_NUM = 5
     FLOW1_LEVEL_NUM = 25
@@ -115,20 +113,43 @@ def setup_main_logging():
     return logger
 
 
-def setup_custom_logging(loggername: str, LOG_DIR: str = None):
+def setup_custom_logging(loggername: str, LOG_DIR: str = None, noscreen: bool = False):
     local_logger = logging.getLogger(loggername)
 
     # Remove existing handlers if they exist
-    if local_logger.hasHandlers():
-        local_logger.handlers.clear()
+    while local_logger.hasHandlers():
+        local_logger.removeHandler(local_logger.handlers[0])
 
-    if not LOG_DIR:
+    if LOG_DIR:
         current_date = datetime.now().strftime("%Y%m%d")
-        local_handler = logging.FileHandler(
-            os.path.join(LOG_DIR, f"{current_date}-{loggername}.log")
-        )
-    local_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    local_handler.setFormatter(local_formatter)
-    local_logger.addHandler(local_handler)
+        log_file_path = os.path.join(LOG_DIR, f"{current_date}-{loggername}.log")
+        local_handler = logging.FileHandler(log_file_path)
+
+        # Create and set formatter
+        local_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        local_handler.setFormatter(local_formatter)
+
+        # Add handler to logger
+        local_logger.addHandler(local_handler)
+    else:
+        # Ensure a default handler is added if no LOG_DIR is provided
+        local_handler = logging.StreamHandler()
+        local_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        local_handler.setFormatter(local_formatter)
+        local_logger.addHandler(local_handler)
+
     local_logger.setLevel(logging.INFO)
+    if noscreen:
+        local_logger.handlers = [
+            handler
+            for handler in local_logger.handlers
+            if isinstance(handler, logging.FileHandler)
+        ]
     return local_logger
+
+
+def release_logger(logger):
+    handlers = logger.handlers[:]
+    for handler in handlers:
+        handler.close()
+        logger.removeHandler(handler)
