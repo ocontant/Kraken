@@ -1,4 +1,3 @@
-# krakenfx/api/models/openPositionModel.py
 from sqlalchemy import Column, Float, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 

@@ -1,4 +1,3 @@
-# tests/test_open_position_service.py
 import logging
 
 import pytest

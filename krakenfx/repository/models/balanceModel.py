@@ -1,4 +1,3 @@
-# krakenfx/api/models/balance.py
 from sqlalchemy import Column, String
 
 from krakenfx.repository.models._base import Base

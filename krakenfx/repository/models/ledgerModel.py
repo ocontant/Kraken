@@ -1,4 +1,3 @@
-# krakenfx/api/models/ledger.py
 from sqlalchemy import Column, Float, String
 
 from krakenfx.repository.models._base import Base
